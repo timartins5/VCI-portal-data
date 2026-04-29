@@ -12,22 +12,45 @@
     .tabs { display: flex; gap: 10px; margin-top: 20px; }
     .tab-btn { padding: 8px 15px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 11px; }
     .tab-btn.active { background: var(--vci-blue); color: #fff; }
+    
     .content-area { padding: 30px 40px; display: flex; gap: 30px; align-items: flex-start; }
     .table-section { flex: 3; }
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
     
-    /* BANNER & HEADER STYLES */
-    .footer-header { color: var(--vci-blue); font-size: 14px; font-weight: 700; text-transform: uppercase; margin-top: 40px; margin-bottom: 10px; border-left: 4px solid var(--vci-red); padding-left: 10px; }
-    .snapshot-footer { display: flex; gap: 20px; width: 100%; margin-bottom: 20px; }
-    .footer-box { background: #fff; flex: 1; padding: 15px 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-height: 80px; display: flex; flex-direction: column; justify-content: center; }
+    /* UPDATED CENTERED HEADER STYLE */
+    .footer-header { 
+      color: var(--vci-blue); 
+      font-size: 16px; 
+      font-weight: 700; 
+      text-transform: uppercase; 
+      margin-top: 50px; 
+      margin-bottom: 20px; 
+      text-align: center; 
+      letter-spacing: 1px;
+      position: relative;
+    }
+    
+    /* Optional: Adds a branded line behind the centered header */
+    .footer-header::after {
+      content: "";
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: var(--vci-red);
+      margin: 8px auto 0;
+    }
+
+    .snapshot-footer { display: flex; gap: 20px; width: 100%; margin-bottom: 40px; }
+    .footer-box { background: #fff; flex: 1; padding: 20px 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 4px; }
     .footer-label { font-size: 10px; text-transform: uppercase; color: #999; display: block; margin-bottom: 8px; font-weight: 700; }
-    .footer-val { font-weight: 700; color: var(--vci-blue); font-size: 12px; line-height: 1.4; display: block; white-space: normal; }
+    .footer-val { font-weight: 700; color: var(--vci-blue); font-size: 13px; line-height: 1.4; display: block; }
 
     .category-box { background: #fff; border-top: 5px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .category-header { padding: 12px 15px; font-weight: 700; text-transform: uppercase; font-size: 15px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     table { width: 100%; border-collapse: collapse; }
     th { background: var(--vci-red); color: #fff; padding: 8px 15px; text-align: left; font-size: 11px; text-transform: uppercase; }
     td { padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 13px; }
+    
     .sidebar { flex: 1; min-width: 280px; background: #fff; padding: 25px; border-top: 5px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .sidebar h3 { color: var(--vci-blue); font-size: 16px; text-transform: uppercase; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     .note-block { margin-bottom: 15px; }
@@ -108,17 +131,12 @@
       display.appendChild(buildBox(currentTab, gridGroups[currentTab]));
     }
 
-    // UPDATED BANNER LOGIC
     let fDisplay = document.getElementById('footerDisplay');
-    let fHeader = document.getElementById('footerHeader');
     fDisplay.innerHTML = '';
-    fDisplay.style.display = 'flex';
-    fHeader.style.display = 'block';
-
     const bannerConfig = [
-      { label: 'MONDAY - FRIDAY', key: 'LockDesk_Hours' },
-      { label: 'JUMBO (MON - FRI)', key: 'Jumbo_Hours' },
-      { label: 'WEEKEND', key: 'Weekend_Locks' }
+      { label: 'Monday - Friday', key: 'LockDesk_Hours' },
+      { label: 'Jumbo (Mon - Fri)', key: 'Jumbo_Hours' },
+      { label: 'Weekend', key: 'Weekend_Locks' }
     ];
     bannerConfig.forEach(item => {
       let box = document.createElement('div');
