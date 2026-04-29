@@ -15,10 +15,13 @@
     .content-area { padding: 30px 40px; display: flex; gap: 30px; align-items: flex-start; }
     .table-section { flex: 3; }
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    
+    /* ENHANCED FOOTER FOR LONG TEXT */
     .snapshot-footer { display: flex; gap: 20px; margin-top: 30px; border-top: 3px solid var(--vci-red); padding-top: 20px; width: 100%; }
-    .footer-box { background: #fff; flex: 1; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .footer-label { font-size: 10px; text-transform: uppercase; color: #999; display: block; margin-bottom: 5px; font-weight: 700; }
-    .footer-val { font-weight: 700; color: var(--vci-blue); font-size: 11px; line-height: 1.4; display: block; }
+    .footer-box { background: #fff; flex: 1; padding: 15px 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-height: 80px; display: flex; flex-direction: column; justify-content: center; }
+    .footer-label { font-size: 10px; text-transform: uppercase; color: #999; display: block; margin-bottom: 8px; font-weight: 700; }
+    .footer-val { font-weight: 700; color: var(--vci-blue); font-size: 12px; line-height: 1.4; display: block; white-space: normal; }
+
     .category-box { background: #fff; border-top: 5px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .category-header { padding: 12px 15px; font-weight: 700; text-transform: uppercase; font-size: 15px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     table { width: 100%; border-collapse: collapse; }
@@ -58,7 +61,6 @@
   }
 
   function render() {
-    // Scrub notes
     document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '').replace(/[^\x20-\x7E\n]/g, '');
     let n = '<h3>Notes & Definitions</h3>';
     ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
@@ -67,7 +69,6 @@
     });
     document.getElementById('notesArea').innerHTML = n;
 
-    // Pull from SLA_DATABASE
     let tabList = ['Overview'];
     let gridGroups = {};
     masterData.values.forEach(r => {
@@ -105,20 +106,23 @@
       display.appendChild(buildBox(currentTab, gridGroups[currentTab]));
     }
 
-    // NEW LOGIC: Pull Banner specifically from APP_CONFIG values
+    // THE FIX: Specifically targeting the Keys from your APP_CONFIG tab
     let fDisplay = document.getElementById('footerDisplay');
     fDisplay.innerHTML = '';
     if (currentTab === 'Overview') {
       fDisplay.style.display = 'flex';
-      let hoursKeys = [
+      // These keys MUST match the "Key" column in your APP_CONFIG spreadsheet exactly
+      const bannerConfig = [
         { label: 'MONDAY - FRIDAY', key: 'LockDesk_Hours' },
         { label: 'JUMBO (MON - FRI)', key: 'Jumbo_Hours' },
         { label: 'WEEKEND LOCKS', key: 'Weekend_Locks' }
       ];
-      hoursKeys.forEach(item => {
+      
+      bannerConfig.forEach(item => {
         let box = document.createElement('div');
         box.className = 'footer-box';
-        box.innerHTML = `<span class="footer-label">${item.label}</span><span class="footer-val">${masterData.config[item.key] || ''}</span>`;
+        let timeValue = masterData.config[item.key] || 'Hours Not Set';
+        box.innerHTML = `<span class="footer-label">${item.label}</span><span class="footer-val">${timeValue}</span>`;
         fDisplay.appendChild(box);
       });
     } else { fDisplay.style.display = 'none'; }
