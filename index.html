@@ -16,11 +16,11 @@
     .table-section { flex: 3; }
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
     
-    /* RESTORED FOOTER STYLES */
-    .snapshot-footer { display: flex; gap: 20px; margin-top: 30px; border-top: 3px solid var(--vci-red); padding-top: 20px; clear: both; }
-    .footer-box { background: #fff; flex: 1; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    /* THE BANNER STYLES */
+    .snapshot-footer { display: flex; gap: 20px; margin-top: 30px; border-top: 3px solid var(--vci-red); padding-top: 20px; width: 100%; }
+    .footer-box { background: #fff; flex: 1; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-top: 1px solid #eee; }
     .footer-label { font-size: 10px; text-transform: uppercase; color: #999; display: block; margin-bottom: 5px; font-weight: 700; }
-    .footer-val { font-weight: 700; color: var(--vci-blue); font-size: 14px; line-height: 1.2; }
+    .footer-val { font-weight: 700; color: var(--vci-blue); font-size: 13px; line-height: 1.3; display: block; }
 
     .category-box { background: #fff; border-top: 5px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .category-header { padding: 12px 15px; font-weight: 700; text-transform: uppercase; font-size: 15px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
@@ -66,10 +66,8 @@
   }
 
   function render() {
-    // Nuclear Scrub for Disclaimer
+    // 1. Scrub Notes
     document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '').replace(/[^\x20-\x7E\n]/g, '');
-    
-    // Sidebar Notes
     let n = '<h3>Notes & Definitions</h3>';
     ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
       let cleanText = (masterData.config[k] || 'N/A').replace(/[^\x20-\x7E\n]/g, ' '); 
@@ -77,15 +75,29 @@
     });
     document.getElementById('notesArea').innerHTML = n;
 
-    // Tabs logic
+    // 2. Identify Categories & Tabs
     let tabList = ['Overview'];
-    masterData.values.forEach(r => {
-       let cat = r[0] || "";
-       if (cat && !tabList.includes(cat) && !cat.includes('Col A') && !cat.toLowerCase().includes('hours')) {
-         tabList.push(cat);
-       }
-    });
+    let gridGroups = {};
+    let bannerItems = [];
     
+    masterData.values.forEach(r => {
+      let cat = r[0] || "";
+      if (cat.includes('Col A') || !cat) return;
+      
+      // If category contains "Hours", it goes to the bottom banner
+      if (cat.toLowerCase().includes('hours')) {
+        bannerItems.push(r);
+      } else {
+        // Otherwise it's a table category
+        if (!tabList.includes(cat)) tabList.push(cat);
+        if (currentTab === 'Overview' || cat === currentTab) {
+          if (!gridGroups[cat]) gridGroups[cat] = [];
+          gridGroups[cat].push(r);
+        }
+      }
+    });
+
+    // 3. Render Tab Buttons
     let tBar = document.getElementById('tabBar'); tBar.innerHTML = '';
     tabList.forEach(t => {
       let b = document.createElement('button');
@@ -95,24 +107,7 @@
       tBar.appendChild(b);
     });
 
-    // Group Data
-    let gridGroups = {};
-    let footerRows = [];
-    
-    masterData.values.forEach(r => {
-      let cat = r[0] || "";
-      if (cat.includes('Col A')) return;
-      
-      // Look for any Category containing the word "Hours"
-      if (cat.toLowerCase().includes('hours')) {
-        footerRows.push(r);
-      } else if (currentTab === 'Overview' || cat === currentTab) {
-        if (!gridGroups[cat]) gridGroups[cat] = [];
-        gridGroups[cat].push(r);
-      }
-    });
-
-    // Render Grid
+    // 4. Render Main Tables
     let display = document.getElementById('mainDisplay');
     display.innerHTML = '';
     let catKeys = Object.keys(gridGroups);
@@ -129,14 +124,15 @@
       display.appendChild(buildBox(currentTab, gridGroups[currentTab]));
     }
 
-    // Render Footer Hours
+    // 5. Render Bottom Banner
     let fDisplay = document.getElementById('footerDisplay');
     fDisplay.innerHTML = '';
-    if (currentTab === 'Overview' && footerRows.length > 0) {
+    if (currentTab === 'Overview' && bannerItems.length > 0) {
       fDisplay.style.display = 'flex';
-      footerRows.forEach(r => {
+      bannerItems.forEach(r => {
         let box = document.createElement('div');
         box.className = 'footer-box';
+        // Display Milestone as Label and Purchase column as the value
         box.innerHTML = `<span class="footer-label">${r[1]}</span><span class="footer-val">${r[2]}</span>`;
         fDisplay.appendChild(box);
       });
