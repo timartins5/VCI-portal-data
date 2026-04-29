@@ -52,17 +52,17 @@
   }
 
   function render() {
-    // 1. Aggressive Whitelist Scrubbing for Disclaimer
+    // 1. Aggressive Whitelist Scrub for the disclaimer
     document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '')
-      .replace(/[^\x20-\x7E\n]/g, ''); // ONLY allows standard keyboard characters
+      .replace(/[^\x20-\x7E\n]/g, ''); 
     
-    // 2. Render Sidebar Notes - Specifically hunts and kills the "?" symbols
+    // 2. Render Sidebar Notes with "Clean Bullet" logic
     let n = '<h3>Notes & Definitions</h3>';
     ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
       let rawText = masterData.config[k] || 'N/A';
       
       // WHITELIST SCRUBBING: 
-      // This regex says: "If it's NOT a standard letter/number/space, change it to a clean bullet point."
+      // This identifies hidden formatting and replaces it with a standard bullet point (•)
       let cleanText = rawText.replace(/[^\x20-\x7E\n]/g, '• '); 
       
       n += `<div class="note-block"><span class="note-label">${k.replace(/_/g,' ')}</span>`;
@@ -70,7 +70,7 @@
     });
     document.getElementById('notesArea').innerHTML = n;
 
-    // 3. Render Navigation Tabs
+    // 3. Tab Navigation
     let tabList = ['Overview'];
     for(let i=1; i<masterData.values.length; i++) {
       let c = masterData.values[i][0];
@@ -85,7 +85,7 @@
       tBar.appendChild(b);
     });
 
-    // 4. Group and Render Tables (Snapshot Grid View)
+    // 4. Table Grouping and Grid Layout
     let groups = {};
     for(let i=1; i<masterData.values.length; i++) {
       let cat = masterData.values[i][0];
