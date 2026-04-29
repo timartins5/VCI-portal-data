@@ -51,6 +51,7 @@
 
   async function fetchData() {
     try {
+      // The ?t= timestamp forces the browser to bypass its cache and get the LATEST data
       const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
       masterData = await response.json();
       render();
@@ -103,7 +104,7 @@
       display.appendChild(buildBox(currentTab, gridGroups[currentTab]));
     }
 
-    // UPDATED: Footer banner now displays on ALL pages
+    // Banner is outside the IF, so it shows on ALL pages
     let fDisplay = document.getElementById('footerDisplay');
     fDisplay.innerHTML = '';
     fDisplay.style.display = 'flex';
@@ -115,7 +116,7 @@
     bannerConfig.forEach(item => {
       let box = document.createElement('div');
       box.className = 'footer-box';
-      let timeValue = masterData.config[item.key] || 'Hours Not Set';
+      let timeValue = (masterData.config[item.key] || 'Hours Not Set').replace(/[^\x20-\x7E\n]/g, '-');
       box.innerHTML = `<span class="footer-label">${item.label}</span><span class="footer-val">${timeValue}</span>`;
       fDisplay.appendChild(box);
     });
