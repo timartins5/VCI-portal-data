@@ -52,67 +52,67 @@
   }
 
   function render() {
-    // 1. Scrub weird symbols from the disclaimer using aggressive regex
-    document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '')
-      .replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, ' ')
-      .replace(/[^\x20-\x7E]/g, '');
-    
-    // 2. Render Sidebar Notes with character scrubbing to remove "?"
-    let n = '<h3>Notes & Definitions</h3>';
-    ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
-      let rawText = masterData.config[k] || 'N/A';
+      // 1. Scrub weird symbols from the disclaimer using aggressive regex
+      document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '')
+        .replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, ' ')
+        .replace(/[^\x20-\x7E]/g, '');
       
-      // Replaces hidden formatting and "Smart Bullets" with standard clean characters
-      let cleanText = rawText.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, ' ') 
-                             .replace(/[^\x20-\x7E\n]/g, '• '); 
-      
-      n += `<div class="note-block"><span class="note-label">${k.replace(/_/g,' ')}</span>`;
-      n += `<div class="note-text">${cleanText}</div></div>`;
-    });
-    document.getElementById('notesArea').innerHTML = n;
-
-    // 3. Build the Tab Navigation
-    let tabList = ['Overview'];
-    for(let i=1; i<masterData.values.length; i++) {
-      let c = masterData.values[i][0];
-      if(c && !tabList.includes(c)) tabList.push(c);
-    }
-    
-    let tBar = document.getElementById('tabBar'); 
-    tBar.innerHTML = '';
-    tabList.forEach(t => {
-      let b = document.createElement('button');
-      b.className = 'tab-btn' + (t === currentTab ? ' active' : '');
-      b.innerText = t;
-      b.onclick = () => { currentTab = t; render(); };
-      tBar.appendChild(b);
-    });
-
-    // 4. Group Data by Category
-    let groups = {};
-    for(let i=1; i<masterData.values.length; i++) {
-      let cat = masterData.values[i][0];
-      if(currentTab !== 'Overview' && cat !== currentTab) continue;
-      if(!groups[cat]) groups[cat] = [];
-      groups[cat].push(masterData.values[i]);
-    }
-
-    // 5. Render Tables (Snapshot Grid for Overview, Single for Tabs)
-    let display = document.getElementById('mainDisplay');
-    display.innerHTML = '';
-    let catKeys = Object.keys(groups);
-
-    if(currentTab === 'Overview') {
-      for(let k=0; k<catKeys.length; k+=2) {
-        let grid = document.createElement('div');
-        grid.className = 'snapshot-grid';
-        grid.appendChild(buildBox(catKeys[k], groups[catKeys[k]]));
-        if(catKeys[k+1]) grid.appendChild(buildBox(catKeys[k+1], groups[catKeys[k+1]]));
-        display.appendChild(grid);
+      // 2. Render Sidebar Notes with aggressive character scrubbing to remove "?"
+      let n = '<h3>Notes & Definitions</h3>';
+      ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
+        let rawText = masterData.config[k] || 'N/A';
+        
+        // Specifically targets hidden Unicode formatting and "Smart Bullets" from Sheets
+        let cleanText = rawText.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, ' ') 
+                               .replace(/[^\x20-\x7E\n]/g, '• '); 
+        
+        n += `<div class="note-block"><span class="note-label">${k.replace(/_/g,' ')}</span>`;
+        n += `<div class="note-text">${cleanText}</div></div>`;
+      });
+      document.getElementById('notesArea').innerHTML = n;
+  
+      // 3. Build the Tab Navigation
+      let tabList = ['Overview'];
+      for(let i=1; i<masterData.values.length; i++) {
+        let c = masterData.values[i][0];
+        if(c && !tabList.includes(c)) tabList.push(c);
       }
-    } else {
-      display.appendChild(buildBox(currentTab, groups[currentTab]));
-    }
+      
+      let tBar = document.getElementById('tabBar'); 
+      tBar.innerHTML = '';
+      tabList.forEach(t => {
+        let b = document.createElement('button');
+        b.className = 'tab-btn' + (t === currentTab ? ' active' : '');
+        b.innerText = t;
+        b.onclick = () => { currentTab = t; render(); };
+        tBar.appendChild(b);
+      });
+  
+      // 4. Group Data by Category for Snapshot View
+      let groups = {};
+      for(let i=1; i<masterData.values.length; i++) {
+        let cat = masterData.values[i][0];
+        if(currentTab !== 'Overview' && cat !== currentTab) continue;
+        if(!groups[cat]) groups[cat] = [];
+        groups[cat].push(masterData.values[i]);
+      }
+  
+      // 5. Render Tables (Snapshot Grid for Overview, Single for Tabs)
+      let display = document.getElementById('mainDisplay');
+      display.innerHTML = '';
+      let catKeys = Object.keys(groups);
+  
+      if(currentTab === 'Overview') {
+        for(let k=0; k<catKeys.length; k+=2) {
+          let grid = document.createElement('div');
+          grid.className = 'snapshot-grid';
+          grid.appendChild(buildBox(catKeys[k], groups[catKeys[k]]));
+          if(catKeys[k+1]) grid.appendChild(buildBox(catKeys[k+1], groups[catKeys[k+1]]));
+          display.appendChild(grid);
+        }
+      } else {
+        display.appendChild(buildBox(currentTab, groups[currentTab]));
+      }
   }
 
   function buildBox(title, rows) {
