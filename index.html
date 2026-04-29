@@ -2,16 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     body { font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; }
     .header-area { background: #fff; padding: 20px 40px; border-bottom: 1px solid #ddd; }
-    
-    /* 2. Header size matched to admin portal (39px) */
     h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 39px; }
-    
     .uw-disclaimer { font-size: 13px; color: #666; font-style: italic; margin-top: 5px; display: block; }
     .tabs { display: flex; gap: 10px; margin-top: 20px; }
     .tab-btn { padding: 8px 15px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 11px; }
@@ -51,7 +47,7 @@
 
   async function fetchData() {
     try {
-      const response = await fetch(DATA_URL);
+      const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
       masterData = await response.json();
       render();
     } catch (e) {
@@ -60,32 +56,22 @@
   }
 
   function render() {
-    // Scrub disclaimer
-    document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '')
-      .replace(/[^\x20-\x7E\n]/g, ''); 
+    document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '').replace(/[^\x20-\x7E\n]/g, '');
     
-    // 3. The Definitive Note Scrubbing Logic
     let n = '<h3>Notes & Definitions</h3>';
     ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
       let rawText = masterData.config[k] || 'N/A';
-      
-      // Forces hidden Google symbols to become standard web characters
-      let cleanText = rawText
-        .replace(/\u00A0/g, ' ')      // Fix non-breaking spaces
-        .replace(/\u2022/g, '• ')    // Fix Smart Bullets
-        .replace(/\u2013|\u2014/g, '-') // Fix Smart Dashes
-        .replace(/[^\x20-\x7E\n•]/g, ''); // Safety scrub everything else
-      
+      // The "Nuclear Scrub" for ? symbols
+      let cleanText = rawText.replace(/[^\x20-\x7E\n]/g, ' '); 
       n += `<div class="note-block"><span class="note-label">${k.replace(/_/g,' ')}</span>`;
       n += `<div class="note-text">${cleanText}</div></div>`;
     });
     document.getElementById('notesArea').innerHTML = n;
 
-    // Tab Logic
     let tabList = ['Overview'];
     for(let i=1; i<masterData.values.length; i++) {
       let c = masterData.values[i][0];
-      if(c && !tabList.includes(c)) tabList.push(c);
+      if(c && !tabList.includes(c) && c !== 'Category (Col A)') tabList.push(c);
     }
     
     let tBar = document.getElementById('tabBar'); tBar.innerHTML = '';
@@ -97,10 +83,10 @@
       tBar.appendChild(b);
     });
 
-    // Grid Rendering
     let groups = {};
     for(let i=1; i<masterData.values.length; i++) {
       let cat = masterData.values[i][0];
+      if(cat === 'Category (Col A)') continue;
       if(currentTab !== 'Overview' && cat !== currentTab) continue;
       if(!groups[cat]) groups[cat] = [];
       groups[cat].push(masterData.values[i]);
@@ -122,18 +108,20 @@
       display.appendChild(buildBox(currentTab, groups[currentTab]));
     }
   }
-  
+
   function buildBox(title, rows) {
     let box = document.createElement('div');
     box.className = 'category-box';
     let h = `<div class="category-header">${title}</div>`;
-    h += '<table><thead><tr><th>Milestone</th><th>Purchase</th><th>Refi</th></tr></thead><tbody>';
+    // Headers updated to match your new Milestone titles
+    h += '<table><thead><tr><th>Milestone</th><th>Purchase</th><th>Refinance</th></tr></thead><tbody>';
     rows.forEach(r => {
       h += `<tr><td>${r[1]}</td><td>${r[2].replace('|',' ')}</td><td>${r[3].replace('|',' ')}</td></tr>`;
     });
     box.innerHTML = h + '</tbody></table>';
     return box;
   }
+
   fetchData();
 </script>
 </body>
