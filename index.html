@@ -52,11 +52,18 @@
   }
 
   function render() {
-    document.getElementById('disclaimer').innerText = masterData.config['UW_Disclaimer'] || '';
+    // Scrub weird symbols from the disclaimer
+    document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '').replace(/[^\x20-\x7E]/g, '');
+    
     let n = '<h3>Notes & Definitions</h3>';
     ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
+      let rawText = masterData.config[k] || 'N/A';
+      
+      // FOOLPROOF SCRUBBING: Replaces any weird symbols (?) with a standard bullet point
+      let cleanText = rawText.replace(/[^\x20-\x7E\n]/g, '• '); 
+      
       n += `<div class="note-block"><span class="note-label">${k.replace(/_/g,' ')}</span>`;
-      n += `<div class="note-text">${masterData.config[k] || 'N/A'}</div></div>`;
+      n += `<div class="note-text">${cleanText}</div></div>`;
     });
     document.getElementById('notesArea').innerHTML = n;
 
