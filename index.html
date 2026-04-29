@@ -51,6 +51,7 @@
 
   async function fetchData() {
     try {
+      // The Date().getTime() forces the browser to get fresh data every time
       const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
       masterData = await response.json();
       render();
