@@ -106,12 +106,11 @@
       display.appendChild(buildBox(currentTab, gridGroups[currentTab]));
     }
 
-    // THE FIX: Specifically targeting the Keys from your APP_CONFIG tab
+    // Render Banner logic inside index.html render function
     let fDisplay = document.getElementById('footerDisplay');
     fDisplay.innerHTML = '';
     if (currentTab === 'Overview') {
       fDisplay.style.display = 'flex';
-      // These keys MUST match the "Key" column in your APP_CONFIG spreadsheet exactly
       const bannerConfig = [
         { label: 'MONDAY - FRIDAY', key: 'LockDesk_Hours' },
         { label: 'JUMBO (MON - FRI)', key: 'Jumbo_Hours' },
@@ -121,11 +120,11 @@
       bannerConfig.forEach(item => {
         let box = document.createElement('div');
         box.className = 'footer-box';
+        // Pulls directly from the config object we just allowed in Code.gs
         let timeValue = masterData.config[item.key] || 'Hours Not Set';
         box.innerHTML = `<span class="footer-label">${item.label}</span><span class="footer-val">${timeValue}</span>`;
         fDisplay.appendChild(box);
       });
-    } else { fDisplay.style.display = 'none'; }
   }
 
   function buildBox(title, rows) {
