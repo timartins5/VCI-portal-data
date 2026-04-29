@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
@@ -52,25 +53,29 @@
   }
 
   function render() {
-    // 1. Aggressive Whitelist Scrub for the disclaimer
+    // Aggressive scrub for disclaimer
     document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '')
+      .replace(/[\u201C\u201D\u2018\u2019]/g, '"') // Fix smart quotes
       .replace(/[^\x20-\x7E\n]/g, ''); 
     
-    // 2. Render Sidebar Notes with "Clean Bullet" logic
     let n = '<h3>Notes & Definitions</h3>';
     ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
       let rawText = masterData.config[k] || 'N/A';
       
-      // WHITELIST SCRUBBING: 
-      // This identifies hidden formatting and replaces it with a standard bullet point (•)
-      let cleanText = rawText.replace(/[^\x20-\x7E\n]/g, '• '); 
+      // THE DEFINITIVE FIX:
+      // 1. Manually swap the common "Smart" characters that cause '?'
+      let cleanText = rawText
+        .replace(/\u2022/g, '• ')   // Google Bullet -> Standard Bullet
+        .replace(/\u2013|\u2014/g, '-') // Smart Dashes -> Standard Dash
+        .replace(/\u00A0/g, ' ')     // Non-breaking space -> Standard Space
+        // 2. Final safety scrub for anything else lingering
+        .replace(/[^\x20-\x7E\n•]/g, ''); 
       
       n += `<div class="note-block"><span class="note-label">${k.replace(/_/g,' ')}</span>`;
       n += `<div class="note-text">${cleanText}</div></div>`;
     });
     document.getElementById('notesArea').innerHTML = n;
 
-    // 3. Tab Navigation
     let tabList = ['Overview'];
     for(let i=1; i<masterData.values.length; i++) {
       let c = masterData.values[i][0];
@@ -85,7 +90,6 @@
       tBar.appendChild(b);
     });
 
-    // 4. Table Grouping and Grid Layout
     let groups = {};
     for(let i=1; i<masterData.values.length; i++) {
       let cat = masterData.values[i][0];
