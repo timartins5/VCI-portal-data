@@ -1,13 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     body { font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; }
     .header-area { background: #fff; padding: 20px 40px; border-bottom: 1px solid #ddd; }
+    
+    /* 2. Header size matched to admin portal (39px) */
     h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 39px; }
+    
     .uw-disclaimer { font-size: 13px; color: #666; font-style: italic; margin-top: 5px; display: block; }
     .tabs { display: flex; gap: 10px; margin-top: 20px; }
     .tab-btn { padding: 8px 15px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 11px; }
@@ -28,15 +32,18 @@
   </style>
 </head>
 <body>
+
 <div class="header-area">
   <h2>Daily Turn Times</h2>
   <span class="uw-disclaimer" id="disclaimer"></span>
   <div class="tabs" id="tabBar"></div>
 </div>
+
 <div class="content-area">
   <div class="table-section" id="mainDisplay">Loading latest data...</div>
   <div class="sidebar" id="notesArea"></div>
 </div>
+
 <script>
   const DATA_URL = 'https://raw.githubusercontent.com/timartins5/VCI-portal-data/main/data/turn-times.json';
   let currentTab = 'Overview';
@@ -53,34 +60,34 @@
   }
 
   function render() {
-    // Aggressive scrub for disclaimer
+    // Scrub disclaimer
     document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '')
-      .replace(/[\u201C\u201D\u2018\u2019]/g, '"') // Fix smart quotes
       .replace(/[^\x20-\x7E\n]/g, ''); 
     
+    // 3. The Definitive Note Scrubbing Logic
     let n = '<h3>Notes & Definitions</h3>';
     ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
       let rawText = masterData.config[k] || 'N/A';
       
-      // THE DEFINITIVE FIX:
-      // 1. Manually swap the common "Smart" characters that cause '?'
+      // Forces hidden Google symbols to become standard web characters
       let cleanText = rawText
-        .replace(/\u2022/g, '• ')   // Google Bullet -> Standard Bullet
-        .replace(/\u2013|\u2014/g, '-') // Smart Dashes -> Standard Dash
-        .replace(/\u00A0/g, ' ')     // Non-breaking space -> Standard Space
-        // 2. Final safety scrub for anything else lingering
-        .replace(/[^\x20-\x7E\n•]/g, ''); 
+        .replace(/\u00A0/g, ' ')      // Fix non-breaking spaces
+        .replace(/\u2022/g, '• ')    // Fix Smart Bullets
+        .replace(/\u2013|\u2014/g, '-') // Fix Smart Dashes
+        .replace(/[^\x20-\x7E\n•]/g, ''); // Safety scrub everything else
       
       n += `<div class="note-block"><span class="note-label">${k.replace(/_/g,' ')}</span>`;
       n += `<div class="note-text">${cleanText}</div></div>`;
     });
     document.getElementById('notesArea').innerHTML = n;
 
+    // Tab Logic
     let tabList = ['Overview'];
     for(let i=1; i<masterData.values.length; i++) {
       let c = masterData.values[i][0];
       if(c && !tabList.includes(c)) tabList.push(c);
     }
+    
     let tBar = document.getElementById('tabBar'); tBar.innerHTML = '';
     tabList.forEach(t => {
       let b = document.createElement('button');
@@ -90,6 +97,7 @@
       tBar.appendChild(b);
     });
 
+    // Grid Rendering
     let groups = {};
     for(let i=1; i<masterData.values.length; i++) {
       let cat = masterData.values[i][0];
