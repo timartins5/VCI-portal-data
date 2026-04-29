@@ -51,7 +51,6 @@
 
   async function fetchData() {
     try {
-      // The Date().getTime() forces the browser to get fresh data every time
       const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
       masterData = await response.json();
       render();
@@ -104,23 +103,22 @@
       display.appendChild(buildBox(currentTab, gridGroups[currentTab]));
     }
 
+    // UPDATED: Footer banner now displays on ALL pages
     let fDisplay = document.getElementById('footerDisplay');
     fDisplay.innerHTML = '';
-    if (currentTab === 'Overview') {
-      fDisplay.style.display = 'flex';
-      const bannerConfig = [
-        { label: 'MONDAY - FRIDAY', key: 'LockDesk_Hours' },
-        { label: 'JUMBO (MON - FRI)', key: 'Jumbo_Hours' },
-        { label: 'WEEKEND LOCKS', key: 'Weekend_Locks' }
-      ];
-      bannerConfig.forEach(item => {
-        let box = document.createElement('div');
-        box.className = 'footer-box';
-        let timeValue = masterData.config[item.key] || 'Hours Not Set';
-        box.innerHTML = `<span class="footer-label">${item.label}</span><span class="footer-val">${timeValue}</span>`;
-        fDisplay.appendChild(box);
-      });
-    } else { fDisplay.style.display = 'none'; }
+    fDisplay.style.display = 'flex';
+    const bannerConfig = [
+      { label: 'MONDAY - FRIDAY', key: 'LockDesk_Hours' },
+      { label: 'JUMBO (MON - FRI)', key: 'Jumbo_Hours' },
+      { label: 'WEEKEND LOCKS', key: 'Weekend_Locks' }
+    ];
+    bannerConfig.forEach(item => {
+      let box = document.createElement('div');
+      box.className = 'footer-box';
+      let timeValue = masterData.config[item.key] || 'Hours Not Set';
+      box.innerHTML = `<span class="footer-label">${item.label}</span><span class="footer-val">${timeValue}</span>`;
+      fDisplay.appendChild(box);
+    });
   }
 
   function buildBox(title, rows) {
