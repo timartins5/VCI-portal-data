@@ -6,7 +6,7 @@
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     body { font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; }
     .header-area { background: #fff; padding: 20px 40px; border-bottom: 1px solid #ddd; }
-    h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 32px; }
+    h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 39px; }
     .uw-disclaimer { font-size: 13px; color: #666; font-style: italic; margin-top: 5px; display: block; }
     .tabs { display: flex; gap: 10px; margin-top: 20px; }
     .tab-btn { padding: 8px 15px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 11px; }
@@ -52,15 +52,17 @@
   }
 
   function render() {
-    // 1. Scrub weird symbols from the disclaimer at the top
-    document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '').replace(/[^\x20-\x7E]/g, '');
+    // 1. Scrub weird symbols from the disclaimer using aggressive regex
+    document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '')
+      .replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, ' ')
+      .replace(/[^\x20-\x7E]/g, '');
     
-    // 2. Render Sidebar Notes with aggressive scrubbing for hidden characters
+    // 2. Render Sidebar Notes with character scrubbing to remove "?"
     let n = '<h3>Notes & Definitions</h3>';
     ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
       let rawText = masterData.config[k] || 'N/A';
       
-      // Specifically targets the hidden Unicode characters causing the "?" symbols
+      // Replaces hidden formatting and "Smart Bullets" with standard clean characters
       let cleanText = rawText.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, ' ') 
                              .replace(/[^\x20-\x7E\n]/g, '• '); 
       
@@ -101,7 +103,6 @@
     let catKeys = Object.keys(groups);
 
     if(currentTab === 'Overview') {
-      // Creates the side-by-side layout (2 columns)
       for(let k=0; k<catKeys.length; k+=2) {
         let grid = document.createElement('div');
         grid.className = 'snapshot-grid';
@@ -110,7 +111,6 @@
         display.appendChild(grid);
       }
     } else {
-      // Single full-width table for specific tabs
       display.appendChild(buildBox(currentTab, groups[currentTab]));
     }
   }
