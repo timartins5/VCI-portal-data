@@ -51,7 +51,6 @@
 
   async function fetchData() {
     try {
-      // The ?t= timestamp forces the browser to bypass its cache and get the LATEST data
       const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
       masterData = await response.json();
       render();
@@ -104,12 +103,11 @@
       display.appendChild(buildBox(currentTab, gridGroups[currentTab]));
     }
 
-    // Banner is outside the IF, so it shows on ALL pages
     let fDisplay = document.getElementById('footerDisplay');
     fDisplay.innerHTML = '';
     fDisplay.style.display = 'flex';
     const bannerConfig = [
-      { label: 'MONDAY - FRIDAY', key: 'LockDesk_Hours' },
+      { label: 'MONDAY - FRIDAY LOCKS', key: 'LockDesk_Hours' },
       { label: 'JUMBO (MON - FRI)', key: 'Jumbo_Hours' },
       { label: 'WEEKEND LOCKS', key: 'Weekend_Locks' }
     ];
