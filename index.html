@@ -52,27 +52,32 @@
   }
 
   function render() {
-    // Scrub weird symbols from the disclaimer
+    // 1. Scrub weird symbols from the disclaimer at the top
     document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '').replace(/[^\x20-\x7E]/g, '');
     
+    // 2. Render Sidebar Notes with aggressive scrubbing for hidden characters
     let n = '<h3>Notes & Definitions</h3>';
     ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
       let rawText = masterData.config[k] || 'N/A';
       
-      // FOOLPROOF SCRUBBING: Replaces any weird symbols (?) with a standard bullet point
-      let cleanText = rawText.replace(/[^\x20-\x7E\n]/g, '• '); 
+      // Specifically targets the hidden Unicode characters causing the "?" symbols
+      let cleanText = rawText.replace(/[\u00A0\u1680\u180E\u2000-\u200B\u202F\u205F\u3000\uFEFF]/g, ' ') 
+                             .replace(/[^\x20-\x7E\n]/g, '• '); 
       
       n += `<div class="note-block"><span class="note-label">${k.replace(/_/g,' ')}</span>`;
       n += `<div class="note-text">${cleanText}</div></div>`;
     });
     document.getElementById('notesArea').innerHTML = n;
 
+    // 3. Build the Tab Navigation
     let tabList = ['Overview'];
     for(let i=1; i<masterData.values.length; i++) {
       let c = masterData.values[i][0];
       if(c && !tabList.includes(c)) tabList.push(c);
     }
-    let tBar = document.getElementById('tabBar'); tBar.innerHTML = '';
+    
+    let tBar = document.getElementById('tabBar'); 
+    tBar.innerHTML = '';
     tabList.forEach(t => {
       let b = document.createElement('button');
       b.className = 'tab-btn' + (t === currentTab ? ' active' : '');
@@ -81,6 +86,7 @@
       tBar.appendChild(b);
     });
 
+    // 4. Group Data by Category
     let groups = {};
     for(let i=1; i<masterData.values.length; i++) {
       let cat = masterData.values[i][0];
@@ -89,10 +95,13 @@
       groups[cat].push(masterData.values[i]);
     }
 
+    // 5. Render Tables (Snapshot Grid for Overview, Single for Tabs)
     let display = document.getElementById('mainDisplay');
     display.innerHTML = '';
     let catKeys = Object.keys(groups);
+
     if(currentTab === 'Overview') {
+      // Creates the side-by-side layout (2 columns)
       for(let k=0; k<catKeys.length; k+=2) {
         let grid = document.createElement('div');
         grid.className = 'snapshot-grid';
@@ -101,6 +110,7 @@
         display.appendChild(grid);
       }
     } else {
+      // Single full-width table for specific tabs
       display.appendChild(buildBox(currentTab, groups[currentTab]));
     }
   }
