@@ -73,65 +73,72 @@
   }
 
   function render() {
-    document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '').replace(/[^\x20-\x7E\n]/g, '');
-    let n = '<h3>Notes & Definitions</h3>';
-    ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
-      let cleanText = (masterData.config[k] || 'N/A').replace(/[^\x20-\x7E\n]/g, ' '); 
-      n += `<div class="note-block"><span class="note-label">${k.replace(/_/g,' ')}</span><div class="note-text">${cleanText}</div></div>`;
-    });
-    document.getElementById('notesArea').innerHTML = n;
-
-    let tabList = ['Overview'];
-    let gridGroups = {};
-    masterData.values.forEach(r => {
-      let cat = r[0] || "";
-      if (cat.includes('Col A') || !cat) return;
-      if (!tabList.indexOf(cat)) tabList.push(cat);
-      if (currentTab === 'Overview' || cat === currentTab) {
-        if (!gridGroups[cat]) gridGroups[cat] = [];
-        gridGroups[cat].push(r);
+      document.getElementById('disclaimer').innerText = (masterData.config['UW_Disclaimer'] || '').replace(/[^\x20-\x7E\n]/g, '');
+      let n = '<h3>Notes & Definitions</h3>';
+      ['UW_Assignment_Note', 'Advanced_UW_Criteria', 'Lock_Desk_Detail', 'Non_Del_Review'].forEach(k => {
+        let cleanText = (masterData.config[k] || 'N/A').replace(/[^\x20-\x7E\n]/g, ' '); 
+        n += `<div class="note-block"><span class="note-label">${k.replace(/_/g,' ')}</span><div class="note-text">${cleanText}</div></div>`;
+      });
+      document.getElementById('notesArea').innerHTML = n;
+  
+      // --- CRITICAL FIX FOR TABS ---
+      let tabList = ['Overview'];
+      let gridGroups = {};
+      masterData.values.forEach((r, idx) => {
+        if (idx === 0) return; // Skip the header row
+        let cat = r[0] || "";
+        if (!cat || cat.includes('Col A')) return; // Skip empty or helper cells
+        
+        // Add unique categories to the tab list
+        if (tabList.indexOf(cat) === -1) tabList.push(cat);
+        
+        // Group data for display
+        if (currentTab === 'Overview' || cat === currentTab) {
+          if (!gridGroups[cat]) gridGroups[cat] = [];
+          gridGroups[cat].push(r);
+        }
+      });
+  
+      let tBar = document.getElementById('tabBar'); tBar.innerHTML = '';
+      tabList.forEach(t => {
+        let b = document.createElement('button');
+        b.className = 'tab-btn' + (t === currentTab ? ' active' : '');
+        b.innerText = t;
+        b.onclick = function() { currentTab = t; render(); };
+        tBar.appendChild(b);
+      });
+      // --- END OF FIX ---
+  
+      let display = document.getElementById('mainDisplay');
+      display.innerHTML = '';
+      let catKeys = Object.keys(gridGroups);
+  
+      if(currentTab === 'Overview') {
+        for(let k=0; k<catKeys.length; k+=2) {
+          let grid = document.createElement('div');
+          grid.className = 'snapshot-grid';
+          grid.appendChild(buildBox(catKeys[k], gridGroups[catKeys[k]]));
+          if(catKeys[k+1]) grid.appendChild(buildBox(catKeys[k+1], gridGroups[catKeys[k+1]]));
+          display.appendChild(grid);
+        }
+      } else {
+        display.appendChild(buildBox(currentTab, gridGroups[currentTab]));
       }
-    });
-
-    let tBar = document.getElementById('tabBar'); tBar.innerHTML = '';
-    tabList.forEach(t => {
-      let b = document.createElement('button');
-      b.className = 'tab-btn' + (t === currentTab ? ' active' : '');
-      b.innerText = t;
-      b.onclick = function() { currentTab = t; render(); };
-      tBar.appendChild(b);
-    });
-
-    let display = document.getElementById('mainDisplay');
-    display.innerHTML = '';
-    let catKeys = Object.keys(gridGroups);
-
-    if(currentTab === 'Overview') {
-      for(let k=0; k<catKeys.length; k+=2) {
-        let grid = document.createElement('div');
-        grid.className = 'snapshot-grid';
-        grid.appendChild(buildBox(catKeys[k], gridGroups[catKeys[k]]));
-        if(catKeys[k+1]) grid.appendChild(buildBox(catKeys[k+1], gridGroups[catKeys[k+1]]));
-        display.appendChild(grid);
-      }
-    } else {
-      display.appendChild(buildBox(currentTab, gridGroups[currentTab]));
-    }
-
-    let fDisplay = document.getElementById('footerDisplay');
-    fDisplay.innerHTML = '';
-    const bannerConfig = [
-      { label: 'Monday - Friday', key: 'LockDesk_Hours' },
-      { label: 'Jumbo (Mon - Fri)', key: 'Jumbo_Hours' },
-      { label: 'Weekend', key: 'Weekend_Locks' }
-    ];
-    bannerConfig.forEach(item => {
-      let box = document.createElement('div');
-      box.className = 'footer-box';
-      let timeValue = (masterData.config[item.key] || 'Hours Not Set').replace(/[^\x20-\x7E\n]/g, '-');
-      box.innerHTML = `<span class="footer-label">${item.label}</span><span class="footer-val">${timeValue}</span>`;
-      fDisplay.appendChild(box);
-    });
+  
+      let fDisplay = document.getElementById('footerDisplay');
+      fDisplay.innerHTML = '';
+      const bannerConfig = [
+        { label: 'Monday - Friday', key: 'LockDesk_Hours' },
+        { label: 'Jumbo (Mon - Fri)', key: 'Jumbo_Hours' },
+        { label: 'Weekend', key: 'Weekend_Locks' }
+      ];
+      bannerConfig.forEach(item => {
+        let box = document.createElement('div');
+        box.className = 'footer-box';
+        let timeValue = (masterData.config[item.key] || 'Hours Not Set').replace(/[^\x20-\x7E\n]/g, '-');
+        box.innerHTML = `<span class="footer-label">${item.label}</span><span class="footer-val">${timeValue}</span>`;
+        fDisplay.appendChild(box);
+      });
   }
 
   function buildBox(title, rows) {
