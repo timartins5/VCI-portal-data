@@ -21,12 +21,23 @@
     .footer-box { background: #fff; flex: 1; padding: 20px 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 4px; }
     .footer-label { font-size: 10px; text-transform: uppercase; color: #999; display: block; margin-bottom: 8px; font-weight: 700; }
     .footer-val { font-weight: 700; color: var(--vci-blue); font-size: 13px; line-height: 1.4; display: block; }
+    
     .category-box { background: #fff; border-top: 5px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .category-header { padding: 12px 15px; font-weight: 700; text-transform: uppercase; font-size: 15px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
-    table { width: 100%; border-collapse: collapse; }
-    /* Adjusted font size to accommodate 4 columns */
-    th { background: var(--vci-red); color: #fff; padding: 8px 8px; text-align: left; font-size: 9px; text-transform: uppercase; }
-    td { padding: 8px 8px; border-bottom: 1px solid #eee; font-size: 11px; }
+    
+    /* UPDATED: Category Header Size */
+    .category-header { padding: 15px 20px; font-weight: 700; text-transform: uppercase; font-size: 18px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
+    
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    
+    /* UPDATED: Table Header Size */
+    th { background: var(--vci-red); color: #fff; padding: 10px 8px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 10px 8px; border-bottom: 1px solid #eee; font-size: 12px; word-wrap: break-word; }
+    
+    th:nth-child(1), td:nth-child(1) { width: 34%; } 
+    th:nth-child(2), td:nth-child(2),
+    th:nth-child(3), td:nth-child(3),
+    th:nth-child(4), td:nth-child(4) { width: 22%; text-align: center; }
+
     .sidebar { flex: 1; min-width: 280px; background: #fff; padding: 25px; border-top: 5px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .sidebar h3 { color: var(--vci-blue); font-size: 16px; text-transform: uppercase; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     .note-block { margin-bottom: 15px; }
@@ -75,7 +86,7 @@
     masterData.values.forEach(r => {
       let cat = r[0] || "";
       if (cat.includes('Col A') || !cat) return;
-      if (!tabList.includes(cat)) tabList.push(cat);
+      if (!tabList.indexOf(cat)) tabList.push(cat);
       if (currentTab === 'Overview' || cat === currentTab) {
         if (!gridGroups[cat]) gridGroups[cat] = [];
         gridGroups[cat].push(r);
@@ -87,7 +98,7 @@
       let b = document.createElement('button');
       b.className = 'tab-btn' + (t === currentTab ? ' active' : '');
       b.innerText = t;
-      b.onclick = () => { currentTab = t; render(); };
+      b.onclick = function() { currentTab = t; render(); };
       tBar.appendChild(b);
     });
 
