@@ -18,50 +18,35 @@
     .tab-btn.active { background: var(--vci-blue); color: #fff; }
     
     .content-area { padding: 15px; }
-    
-    /* GRID SETTING: 2 columns at 900px */
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     
     .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
-    
-    /* SECTION HEADER: FIXED 14PX */
     .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 14px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     
-    /* THE CORE FIX: table-layout: fixed + absolute pixel locking */
+    /* THE FIX: table-layout: fixed + Locked Pixel Widths */
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
-    /* RED HEADERS: FIXED 12PX */
-    th { 
-      background: var(--vci-red); 
-      color: #fff; 
-      padding: 8px 1px; 
-      text-align: center; 
-      font-size: 12px; 
-      text-transform: uppercase; 
-      letter-spacing: -0.5px; 
-      font-weight: 700; 
-    }
+    th { background: var(--vci-red); color: #fff; padding: 8px 2px; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: -0.5px; border: none; font-weight: 700; }
     
-    /* PIXEL LOCKING: We force the numbers to stay 80px wide so they CANNOT squish */
+    /* PIXEL LOCKING: We freeze data columns at 85px. They will NEVER squish. */
     .col-stage { width: auto; text-align: left !important; padding-left: 12px !important; }
-    .col-data { width: 80px; } 
+    .col-data { width: 85px; } 
 
-    td { padding: 8px 1px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; }
+    td { padding: 8px 2px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; }
     td:first-child { 
       text-align: left; 
       padding-left: 12px; 
       font-weight: 700; 
       color: var(--vci-blue); 
-      word-wrap: break-word; /* Let long names wrap so rows stay aligned */
+      word-wrap: break-word; /* Long stages can wrap, but they won't push the columns */
     }
 
-    /* Special rule for Delegated 2-column view */
     .del-table .col-time { width: 65%; }
 
-    /* RESPONSIVE: If window is too narrow for 2-column logic, stack them */
+    /* If screen gets too narrow (below 880px), switch to 1-column to avoid cramming */
     @media (max-width: 880px) { 
       .snapshot-grid { grid-template-columns: 1fr; }
-      .col-data { width: 22%; } /* Switch back to % for full-width view */
+      .col-data { width: 25%; } /* Switch to % for full-width view */
     }
   </style>
 </head>
