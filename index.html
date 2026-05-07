@@ -8,36 +8,45 @@
     * { font-family: 'Open Sans', sans-serif !important; box-sizing: border-box; }
     
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
+    
+    /* COMPACT HEADER */
     .header-area { background: #fff; padding: 10px 20px; border-bottom: 1px solid #ddd; }
     h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 22px; }
     .uw-disclaimer { font-size: 9px; color: #666; font-style: italic; display: block; margin-top: 2px; }
     
+    /* TABS */
     .tabs { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-    .tab-btn { padding: 5px 10px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 9px; }
+    .tab-btn { padding: 5px 10px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 10px; }
     .tab-btn.active { background: var(--vci-blue); color: #fff; }
     
     .content-area { padding: 15px; }
+    
+    /* THE GRID SYSTEM */
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     
-    .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; }
-    .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 13px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
+    .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
     
-    /* THE CORE FIX: Fixed layout with strict percentage columns */
+    /* SECTION HEADER: FIXED TO 14PX */
+    .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 14px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
+    
+    /* THE CORE FIX: table-layout: fixed forces columns to honor width % */
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
-    th { background: var(--vci-red); color: #fff; padding: 8px 2px; text-align: center; font-size: 9px; text-transform: uppercase; letter-spacing: -0.2px; border: none; }
+    /* RED TABLE HEADERS: FIXED TO 12PX */
+    th { background: var(--vci-red); color: #fff; padding: 8px 2px; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: -0.4px; border: none; font-weight: 700; }
     
-    /* Strict Widths: Stage (37%), Others (21% each) */
-    th.col-stage { width: 37%; text-align: left; padding-left: 12px; }
-    th.col-data { width: 21%; }
+    /* STRICT WIDTHS FOR ALIGNMENT */
+    .col-stage { width: 38%; text-align: left !important; padding-left: 12px !important; }
+    .col-data { width: 20.66%; }
 
+    /* DATA CELLS */
     td { padding: 8px 2px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; }
     td:first-child { text-align: left; padding-left: 12px; font-weight: 700; color: var(--vci-blue); word-wrap: break-word; }
 
-    /* Delegated View: Stage (37%) and One Large Turn Time (63%) */
-    .del-table th.col-time { width: 63%; }
+    /* DELEGATED VIEW SPECIAL ALIGNMENT */
+    .del-table th.col-time { width: 62%; }
 
-    @media (max-width: 750px) { .snapshot-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 780px) { .snapshot-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -46,7 +55,9 @@
   <span class="uw-disclaimer" id="disclaimer"></span>
   <div class="tabs" id="tabBar"></div>
 </div>
-<div class="content-area"><div id="mainDisplay"></div></div>
+<div class="content-area">
+    <div id="mainDisplay">Loading latest data...</div>
+</div>
 <script>
   const DATA_URL = 'https://raw.githubusercontent.com/timartins5/VCI-portal-data/main/data/turn-times.json';
   var currentTab = 'Overview';
@@ -64,6 +75,7 @@
     document.getElementById('disclaimer').innerText = masterData.config['UW_Disclaimer'] || '';
     let tabList = ['Overview'];
     let gridGroups = {};
+    
     masterData.values.forEach((r, idx) => {
       if (idx === 0) return;
       let cat = r[0] || "";
@@ -88,7 +100,10 @@
     display.innerHTML = '';
     let gridContainer = document.createElement('div');
     gridContainer.className = 'snapshot-grid';
-    Object.keys(gridGroups).forEach(key => { gridContainer.appendChild(buildBox(key, gridGroups[key])); });
+    
+    Object.keys(gridGroups).forEach(key => {
+      gridContainer.appendChild(buildBox(key, gridGroups[key]));
+    });
     display.appendChild(gridContainer);
   }
 
@@ -106,7 +121,9 @@
                 </tr>
               </thead>
               <tbody>`;
-      rows.forEach(r => { h += `<tr><td>${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`; });
+      rows.forEach(r => {
+        h += `<tr><td class="col-stage">${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`;
+      });
     } else {
       h += `<table>
               <thead>
@@ -118,13 +135,13 @@
                 </tr>
               </thead>
               <tbody>`;
-      rows.forEach(r => { 
+      rows.forEach(r => {
         h += `<tr>
-                <td>${r[1]}</td>
-                <td>${(r[2]||'').replace('|',' ')}</td>
-                <td>${(r[3]||'').replace('|',' ')}</td>
-                <td>${(r[4]||'').replace('|',' ')}</td>
-              </tr>`; 
+                <td class="col-stage">${r[1]}</td>
+                <td class="col-data">${(r[2]||'').replace('|',' ')}</td>
+                <td class="col-data">${(r[3]||'').replace('|',' ')}</td>
+                <td class="col-data">${(r[4]||'').replace('|',' ')}</td>
+              </tr>`;
       });
     }
     box.innerHTML = h + '</tbody></table>';
