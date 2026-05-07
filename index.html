@@ -2,35 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Open+Sans+Condensed:wght@700&display=swap" rel="stylesheet">
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     * { font-family: 'Open Sans', sans-serif !important; box-sizing: border-box; }
     
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
-    
     .header-area { background: #fff; padding: 10px 20px; border-bottom: 1px solid #ddd; }
     h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 22px; }
-    .uw-disclaimer { font-size: 9px; color: #666; font-style: italic; display: block; margin-top: 2px; }
     
+    /* TAB STYLING */
     .tabs { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-    .tab-btn { padding: 5px 10px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 10px; }
+    .tab-btn { padding: 6px 12px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 10px; }
     .tab-btn.active { background: var(--vci-blue); color: #fff; }
     
     .content-area { padding: 15px; }
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     
     .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
+    
+    /* SECTION HEADER: FIXED 14PX */
     .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 14px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     
-    /* THE FIX: table-layout: fixed + Locked Pixel Widths */
+    /* THE LOCK: Fixed table layout + Pixel-perfect widths */
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
-    th { background: var(--vci-red); color: #fff; padding: 8px 2px; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: -0.5px; border: none; font-weight: 700; }
+    /* RED HEADERS: Use Condensed font to save horizontal space */
+    th { 
+      background: var(--vci-red); 
+      color: #fff; 
+      padding: 8px 1px; 
+      text-align: center; 
+      font-size: 12px; 
+      font-family: 'Open Sans Condensed', sans-serif !important; 
+      text-transform: uppercase; 
+      border: none; 
+    }
     
-    /* PIXEL LOCKING: We freeze data columns at 85px. They will NEVER squish. */
+    /* COLUMN WIDTHS: Locked in pixels so they CANNOT squish */
     .col-stage { width: auto; text-align: left !important; padding-left: 12px !important; }
-    .col-data { width: 85px; } 
+    .col-data { width: 90px; } /* Enough room for "Streamline" header */
 
     td { padding: 8px 2px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; }
     td:first-child { 
@@ -38,22 +49,22 @@
       padding-left: 12px; 
       font-weight: 700; 
       color: var(--vci-blue); 
-      word-wrap: break-word; /* Long stages can wrap, but they won't push the columns */
+      white-space: normal; /* Stage names can wrap if they must */
+      word-wrap: break-word;
     }
 
     .del-table .col-time { width: 65%; }
 
-    /* If screen gets too narrow (below 880px), switch to 1-column to avoid cramming */
+    /* Breakpoint: If the embed is smaller than 880px, go to single column to prevent total collapse */
     @media (max-width: 880px) { 
       .snapshot-grid { grid-template-columns: 1fr; }
-      .col-data { width: 25%; } /* Switch to % for full-width view */
+      .col-data { width: 22%; } 
     }
   </style>
 </head>
 <body>
 <div class="header-area">
   <h2>Daily Turn Times</h2>
-  <span class="uw-disclaimer" id="disclaimer"></span>
   <div class="tabs" id="tabBar"></div>
 </div>
 <div class="content-area"><div id="mainDisplay"></div></div>
@@ -71,7 +82,6 @@
   }
 
   function render() {
-    document.getElementById('disclaimer').innerText = masterData.config['UW_Disclaimer'] || '';
     let tabList = ['Overview'];
     let gridGroups = {};
     masterData.values.forEach((r, idx) => {
