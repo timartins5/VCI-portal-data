@@ -8,45 +8,38 @@
     * { font-family: 'Open Sans', sans-serif !important; box-sizing: border-box; }
     
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
-    
-    /* COMPACT HEADER */
     .header-area { background: #fff; padding: 10px 20px; border-bottom: 1px solid #ddd; }
     h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 22px; }
     .uw-disclaimer { font-size: 9px; color: #666; font-style: italic; display: block; margin-top: 2px; }
     
-    /* TABS */
     .tabs { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
     .tab-btn { padding: 5px 10px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 10px; }
     .tab-btn.active { background: var(--vci-blue); color: #fff; }
     
     .content-area { padding: 15px; }
     
-    /* THE GRID SYSTEM */
+    /* GRID SETTING: Optimized for wider display */
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     
     .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
-    
-    /* SECTION HEADER: FIXED TO 14PX */
     .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 14px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     
-    /* THE CORE FIX: table-layout: fixed forces columns to honor width % */
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
-    /* RED TABLE HEADERS: FIXED TO 12PX */
-    th { background: var(--vci-red); color: #fff; padding: 8px 2px; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: -0.4px; border: none; font-weight: 700; }
+    /* HEADERS: 12px for clarity, slightly tighter letters for Streamline */
+    th { background: var(--vci-red); color: #fff; padding: 8px 1px; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: -0.5px; border: none; font-weight: 700; }
     
-    /* STRICT WIDTHS FOR ALIGNMENT */
-    .col-stage { width: 38%; text-align: left !important; padding-left: 12px !important; }
-    .col-data { width: 20.66%; }
+    /* COLUMN BALANCING */
+    .col-stage { width: 32%; text-align: left !important; padding-left: 12px !important; }
+    .col-data { width: 22.66%; }
 
-    /* DATA CELLS */
-    td { padding: 8px 2px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; }
-    td:first-child { text-align: left; padding-left: 12px; font-weight: 700; color: var(--vci-blue); word-wrap: break-word; }
+    td { padding: 8px 1px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; word-wrap: break-word; }
+    td:first-child { text-align: left; padding-left: 12px; font-weight: 700; color: var(--vci-blue); }
 
-    /* DELEGATED VIEW SPECIAL ALIGNMENT */
-    .del-table th.col-time { width: 62%; }
+    .del-table .col-time { width: 68%; }
 
-    @media (max-width: 780px) { .snapshot-grid { grid-template-columns: 1fr; } }
+    /* MOBILE BREAKER: Switches to 1 column if width drops below 850px */
+    @media (max-width: 850px) { .snapshot-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -55,9 +48,7 @@
   <span class="uw-disclaimer" id="disclaimer"></span>
   <div class="tabs" id="tabBar"></div>
 </div>
-<div class="content-area">
-    <div id="mainDisplay">Loading latest data...</div>
-</div>
+<div class="content-area"><div id="mainDisplay"></div></div>
 <script>
   const DATA_URL = 'https://raw.githubusercontent.com/timartins5/VCI-portal-data/main/data/turn-times.json';
   var currentTab = 'Overview';
@@ -75,7 +66,6 @@
     document.getElementById('disclaimer').innerText = masterData.config['UW_Disclaimer'] || '';
     let tabList = ['Overview'];
     let gridGroups = {};
-    
     masterData.values.forEach((r, idx) => {
       if (idx === 0) return;
       let cat = r[0] || "";
@@ -100,10 +90,7 @@
     display.innerHTML = '';
     let gridContainer = document.createElement('div');
     gridContainer.className = 'snapshot-grid';
-    
-    Object.keys(gridGroups).forEach(key => {
-      gridContainer.appendChild(buildBox(key, gridGroups[key]));
-    });
+    Object.keys(gridGroups).forEach(key => { gridContainer.appendChild(buildBox(key, gridGroups[key])); });
     display.appendChild(gridContainer);
   }
 
@@ -113,35 +100,12 @@
     let h = `<div class="category-header">${title}</div>`;
     
     if (title.toLowerCase().includes('delegated') && !title.toLowerCase().includes('non')) {
-      h += `<table class="del-table">
-              <thead>
-                <tr>
-                  <th class="col-stage">Stage</th>
-                  <th class="col-time">Turn Time</th>
-                </tr>
-              </thead>
-              <tbody>`;
-      rows.forEach(r => {
-        h += `<tr><td class="col-stage">${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`;
-      });
+      h += `<table class="del-table"><thead><tr><th class="col-stage">Stage</th><th class="col-time">Turn Time</th></tr></thead><tbody>`;
+      rows.forEach(r => { h += `<tr><td class="col-stage">${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`; });
     } else {
-      h += `<table>
-              <thead>
-                <tr>
-                  <th class="col-stage">Stage</th>
-                  <th class="col-data">Purchase</th>
-                  <th class="col-data">Refi</th>
-                  <th class="col-data">Streamline</th>
-                </tr>
-              </thead>
-              <tbody>`;
+      h += `<table><thead><tr><th class="col-stage">Stage</th><th class="col-data">Purchase</th><th class="col-data">Refi</th><th class="col-data">Streamline</th></tr></thead><tbody>`;
       rows.forEach(r => {
-        h += `<tr>
-                <td class="col-stage">${r[1]}</td>
-                <td class="col-data">${(r[2]||'').replace('|',' ')}</td>
-                <td class="col-data">${(r[3]||'').replace('|',' ')}</td>
-                <td class="col-data">${(r[4]||'').replace('|',' ')}</td>
-              </tr>`;
+        h += `<tr><td class="col-stage">${r[1]}</td><td class="col-data">${(r[2]||'').replace('|',' ')}</td><td class="col-data">${(r[3]||'').replace('|',' ')}</td><td class="col-data">${(r[4]||'').replace('|',' ')}</td></tr>`;
       });
     }
     box.innerHTML = h + '</tbody></table>';
