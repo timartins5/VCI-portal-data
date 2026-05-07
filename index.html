@@ -8,33 +8,34 @@
     * { font-family: 'Open Sans', sans-serif !important; box-sizing: border-box; }
     
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
-    .header-area { background: #fff; padding: 8px 15px; border-bottom: 1px solid #ddd; }
-    h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 20px; }
+    .header-area { background: #fff; padding: 10px 20px; border-bottom: 1px solid #ddd; }
+    h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 22px; }
     .uw-disclaimer { font-size: 9px; color: #666; font-style: italic; display: block; margin-top: 2px; }
     
-    .tabs { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-    .tab-btn { padding: 4px 8px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 9px; }
+    .tabs { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .tab-btn { padding: 5px 10px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 9px; }
     .tab-btn.active { background: var(--vci-blue); color: #fff; }
     
-    .content-area { padding: 10px; }
-    .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: start; }
+    .content-area { padding: 15px; }
+    .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     
-    .category-box { background: #fff; border-top: 3px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .category-header { padding: 8px 12px; font-weight: 700; text-transform: uppercase; font-size: 12px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
+    .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; }
+    .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 13px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     
-    /* CRITICAL FIX: Fixed table layout prevents stretching */
+    /* THE CORE FIX: Fixed layout with strict percentage columns */
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
-    /* COLUMN WIDTH LOCKING */
-    th { background: var(--vci-red); color: #fff; padding: 6px 1px; text-align: center; font-size: 9px; text-transform: uppercase; letter-spacing: -0.3px; }
-    th:nth-child(1) { text-align: left; padding-left: 10px; width: 40%; } /* Stage gets 40% */
-    th:nth-child(2), th:nth-child(3), th:nth-child(4) { width: 20%; } /* Numbers get 20% each */
+    th { background: var(--vci-red); color: #fff; padding: 8px 2px; text-align: center; font-size: 9px; text-transform: uppercase; letter-spacing: -0.2px; border: none; }
     
-    td { padding: 6px 2px; border-bottom: 1px solid #eee; font-size: 10.5px; text-align: center; line-height: 1.2; word-wrap: break-word; }
-    td:first-child { text-align: left; padding-left: 10px; font-weight: 700; color: var(--vci-blue); }
+    /* Strict Widths: Stage (37%), Others (21% each) */
+    th.col-stage { width: 37%; text-align: left; padding-left: 12px; }
+    th.col-data { width: 21%; }
 
-    /* For Delegated 2-column view */
-    .del-table th:nth-child(2) { width: 60%; }
+    td { padding: 8px 2px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; }
+    td:first-child { text-align: left; padding-left: 12px; font-weight: 700; color: var(--vci-blue); word-wrap: break-word; }
+
+    /* Delegated View: Stage (37%) and One Large Turn Time (63%) */
+    .del-table th.col-time { width: 63%; }
 
     @media (max-width: 750px) { .snapshot-grid { grid-template-columns: 1fr; } }
   </style>
@@ -97,11 +98,34 @@
     let h = `<div class="category-header">${title}</div>`;
     
     if (title.toLowerCase().includes('delegated') && !title.toLowerCase().includes('non')) {
-      h += '<table class="del-table"><thead><tr><th>Stage</th><th>Turn Time</th></tr></thead><tbody>';
+      h += `<table class="del-table">
+              <thead>
+                <tr>
+                  <th class="col-stage">Stage</th>
+                  <th class="col-time">Turn Time</th>
+                </tr>
+              </thead>
+              <tbody>`;
       rows.forEach(r => { h += `<tr><td>${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`; });
     } else {
-      h += '<table><thead><tr><th>Stage</th><th>Purchase</th><th>Refi</th><th>Streamline</th></tr></thead><tbody>';
-      rows.forEach(r => { h += `<tr><td>${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td><td>${(r[3]||'').replace('|',' ')}</td><td>${(r[4]||'').replace('|',' ')}</td></tr>`; });
+      h += `<table>
+              <thead>
+                <tr>
+                  <th class="col-stage">Stage</th>
+                  <th class="col-data">Purchase</th>
+                  <th class="col-data">Refi</th>
+                  <th class="col-data">Streamline</th>
+                </tr>
+              </thead>
+              <tbody>`;
+      rows.forEach(r => { 
+        h += `<tr>
+                <td>${r[1]}</td>
+                <td>${(r[2]||'').replace('|',' ')}</td>
+                <td>${(r[3]||'').replace('|',' ')}</td>
+                <td>${(r[4]||'').replace('|',' ')}</td>
+              </tr>`; 
+      });
     }
     box.innerHTML = h + '</tbody></table>';
     return box;
