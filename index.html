@@ -5,53 +5,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
-    
-    /* MARKETING REQUIREMENT: GLOBAL OPEN SANS */
     * { font-family: 'Open Sans', sans-serif !important; }
-    
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; }
-    
-    /* COMPACT HEADER AREA */
     .header-area { background: #fff; padding: 10px 20px; border-bottom: 1px solid #ddd; }
     h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 24px; }
     .uw-disclaimer { font-size: 11px; color: #666; font-style: italic; margin-top: 2px; display: block; }
-    
-    /* NAVIGATION TABS */
-    .tabs { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
     .tab-btn { padding: 5px 10px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 9px; }
     .tab-btn.active { background: var(--vci-blue); color: #fff; }
-    
     .content-area { padding: 15px; }
-    
-    /* 2-COLUMN GRID FOR 800PX EMBED */
-    .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-    
-    .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .category-header { padding: 10px 12px; font-weight: 700; text-transform: uppercase; font-size: 14px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
-    
-    /* TABLE STYLING - SQUISH PROTECTION */
+    .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+    .category-box { background: #fff; border-top: 3px solid var(--vci-red); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .category-header { padding: 8px 12px; font-weight: 700; text-transform: uppercase; font-size: 13px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    
-    /* HIGH-VISIBILITY RED HEADERS - FIXED SPACING */
-    th { 
-      background: var(--vci-red); 
-      color: #fff; 
-      padding: 10px 1px; /* Minimal side padding */
-      text-align: center; 
-      font-size: 12px; /* Balanced size */
-      text-transform: uppercase; 
-      letter-spacing: -0.3px; /* Prevents words from touching */
-      font-weight: 700;
-    }
-    
-    th:first-child { text-align: left; padding-left: 10px; width: 32%; }
-    
-    /* DATA CELLS */
-    td { padding: 8px 2px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.3; word-wrap: break-word; }
+    th { background: var(--vci-red); color: #fff; padding: 6px 2px; text-align: center; font-size: 9px; text-transform: uppercase; letter-spacing: -0.3px; }
+    th:first-child { text-align: left; padding-left: 10px; width: 35%; }
+    td { padding: 6px 2px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; word-wrap: break-word; line-height: 1.3; }
     td:first-child { text-align: left; padding-left: 10px; font-weight: 700; color: var(--vci-blue); }
-
-    /* MOBILE FALLBACK */
-    @media (max-width: 650px) { .snapshot-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .snapshot-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -60,9 +31,7 @@
   <span class="uw-disclaimer" id="disclaimer"></span>
   <div class="tabs" id="tabBar"></div>
 </div>
-<div class="content-area">
-    <div id="mainDisplay">Loading latest data...</div>
-</div>
+<div class="content-area"><div id="mainDisplay"></div></div>
 <script>
   const DATA_URL = 'https://raw.githubusercontent.com/timartins5/VCI-portal-data/main/data/turn-times.json';
   var currentTab = 'Overview';
@@ -73,14 +42,13 @@
       const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
       masterData = await response.json();
       render();
-    } catch (e) { document.getElementById('mainDisplay').innerText = 'System synchronization in progress...'; }
+    } catch (e) { document.getElementById('mainDisplay').innerText = 'Syncing...'; }
   }
 
   function render() {
     document.getElementById('disclaimer').innerText = masterData.config['UW_Disclaimer'] || '';
     let tabList = ['Overview'];
     let gridGroups = {};
-    
     masterData.values.forEach((r, idx) => {
       if (idx === 0) return;
       let cat = r[0] || "";
@@ -105,33 +73,18 @@
     display.innerHTML = '';
     let gridContainer = document.createElement('div');
     gridContainer.className = 'snapshot-grid';
-    
-    Object.keys(gridGroups).forEach(key => {
-      gridContainer.appendChild(buildBox(key, gridGroups[key]));
-    });
+    Object.keys(gridGroups).forEach(key => { gridContainer.appendChild(buildBox(key, gridGroups[key])); });
     display.appendChild(gridContainer);
   }
 
   function buildBox(title, rows) {
-      let box = document.createElement('div');
-      box.className = 'category-box';
-      let h = `<div class="category-header">${title}</div><div class="table-wrapper">`;
-      
-      // Check if we are in the Delegated section
-      if (title.toLowerCase().includes('delegated') && !title.toLowerCase().includes('non')) {
-        h += '<table><thead><tr><th>Stage</th><th style="width:65%;">Turn Time</th></tr></thead><tbody>';
-        rows.forEach(r => {
-          h += `<tr><td>${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`;
-        });
-      } else {
-        // Standard 3-column layout for others
-        h += '<table><thead><tr><th>Stage</th><th>Purchase</th><th>Refi</th><th>Streamline</th></tr></thead><tbody>';
-        rows.forEach(r => {
-          h += `<tr><td>${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td><td>${(r[3]||'').replace('|',' ')}</td><td>${(r[4]||'').replace('|',' ')}</td></tr>`;
-        });
-      }
-      box.innerHTML = h + '</tbody></table></div>';
-      return box;
+    let box = document.createElement('div');
+    box.className = 'category-box';
+    let h = `<div class="category-header">${title}</div>`;
+    h += '<table><thead><tr><th>Stage</th><th>Purchase</th><th>Refi</th><th>Streamline</th></tr></thead><tbody>';
+    rows.forEach(r => { h += `<tr><td>${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td><td>${(r[3]||'').replace('|',' ')}</td><td>${(r[4]||'').replace('|',' ')}</td></tr>`; });
+    box.innerHTML = h + '</tbody></table>';
+    return box;
   }
   fetchData();
 </script>
