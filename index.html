@@ -113,15 +113,25 @@
   }
 
   function buildBox(title, rows) {
-    let box = document.createElement('div');
-    box.className = 'category-box';
-    let h = `<div class="category-header">${title}</div>`;
-    h += '<table><thead><tr><th>Stage</th><th>Purchase</th><th>Refi</th><th>Streamline</th></tr></thead><tbody>';
-    rows.forEach(r => {
-      h += `<tr><td>${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td><td>${(r[3]||'').replace('|',' ')}</td><td>${(r[4]||'').replace('|',' ')}</td></tr>`;
-    });
-    box.innerHTML = h + '</tbody></table>';
-    return box;
+      let box = document.createElement('div');
+      box.className = 'category-box';
+      let h = `<div class="category-header">${title}</div><div class="table-wrapper">`;
+      
+      // Check if we are in the Delegated section
+      if (title.toLowerCase().includes('delegated') && !title.toLowerCase().includes('non')) {
+        h += '<table><thead><tr><th>Stage</th><th style="width:65%;">Turn Time</th></tr></thead><tbody>';
+        rows.forEach(r => {
+          h += `<tr><td>${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`;
+        });
+      } else {
+        // Standard 3-column layout for others
+        h += '<table><thead><tr><th>Stage</th><th>Purchase</th><th>Refi</th><th>Streamline</th></tr></thead><tbody>';
+        rows.forEach(r => {
+          h += `<tr><td>${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td><td>${(r[3]||'').replace('|',' ')}</td><td>${(r[4]||'').replace('|',' ')}</td></tr>`;
+        });
+      }
+      box.innerHTML = h + '</tbody></table></div>';
+      return box;
   }
   fetchData();
 </script>
