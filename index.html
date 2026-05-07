@@ -8,6 +8,7 @@
     * { font-family: 'Open Sans', sans-serif !important; box-sizing: border-box; }
     
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
+    
     .header-area { background: #fff; padding: 10px 20px; border-bottom: 1px solid #ddd; }
     h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 22px; }
     .uw-disclaimer { font-size: 9px; color: #666; font-style: italic; display: block; margin-top: 2px; }
@@ -17,6 +18,8 @@
     .tab-btn.active { background: var(--vci-blue); color: #fff; }
     
     .content-area { padding: 15px; }
+    
+    /* GRID SETTING: 2 columns at 900px */
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     
     .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
@@ -24,14 +27,14 @@
     /* SECTION HEADER: FIXED 14PX */
     .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 14px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     
-    /* THE CORE FIX: table-layout: fixed + pixel widths */
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 400px; }
+    /* THE CORE FIX: table-layout: fixed + absolute pixel locking */
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
     /* RED HEADERS: FIXED 12PX */
     th { 
       background: var(--vci-red); 
       color: #fff; 
-      padding: 8px 2px; 
+      padding: 8px 1px; 
       text-align: center; 
       font-size: 12px; 
       text-transform: uppercase; 
@@ -39,25 +42,26 @@
       font-weight: 700; 
     }
     
-    /* PIXEL LOCKING: Ensures Purchase/Refi/Streamline never squish */
+    /* PIXEL LOCKING: We force the numbers to stay 80px wide so they CANNOT squish */
     .col-stage { width: auto; text-align: left !important; padding-left: 12px !important; }
-    .col-data { width: 85px; } /* Locked pixel width for data columns */
+    .col-data { width: 80px; } 
 
-    td { padding: 8px 2px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; }
+    td { padding: 8px 1px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; }
     td:first-child { 
       text-align: left; 
       padding-left: 12px; 
       font-weight: 700; 
       color: var(--vci-blue); 
-      word-wrap: break-word; /* Allows long stage names to wrap without squishing columns */
+      word-wrap: break-word; /* Let long names wrap so rows stay aligned */
     }
 
+    /* Special rule for Delegated 2-column view */
     .del-table .col-time { width: 65%; }
 
-    /* SWITCH TO 1-COLUMN IF TOO NARROW */
+    /* RESPONSIVE: If window is too narrow for 2-column logic, stack them */
     @media (max-width: 880px) { 
       .snapshot-grid { grid-template-columns: 1fr; }
-      .col-data { width: 22%; } /* Switch back to % for full-width single column */
+      .col-data { width: 22%; } /* Switch back to % for full-width view */
     }
   </style>
 </head>
