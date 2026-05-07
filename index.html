@@ -2,141 +2,139 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Open+Sans+Condensed:wght@700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
-    
-    /* THE "CLEAN TEXT" FIX: Improves font rendering on all browsers */
-    * { 
-      font-family: 'Open Sans', sans-serif !important; 
-      box-sizing: border-box; 
-      -webkit-font-smoothing: antialiased; 
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
-    }
-    
-    body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
-    
-    .header-area { background: #fff; padding: 12px 20px; border-bottom: 1px solid #ddd; }
-    h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 22px; }
-    
-    .tabs { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-    .tab-btn { padding: 6px 12px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 10px; }
-    .tab-btn.active { background: var(--vci-blue); color: #fff; }
-    
-    .content-area { padding: 15px; }
-    .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
-    
-    .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
-    
-    /* SECTION HEADER: FIXED 14PX */
-    .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 14px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
-    
-    /* THE LOCK: table-layout: fixed + Precise Widths */
+    :root { --vci-red: #AD2542; --vci-blue: #1B324A; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Open Sans', system-ui, sans-serif; }
+    body { background: #F4F4F4; color: #333; overflow-x: hidden; }
+
+    .header { background: #fff; padding: 14px 20px 0; border-bottom: 2px solid #e0e0e0; }
+    .header h2 { color: var(--vci-blue); font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+
+    .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+    .tab { padding: 7px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; border: none; cursor: pointer; background: transparent; color: #666; border-bottom: 3px solid transparent; transition: all 0.15s; }
+    .tab:hover { color: var(--vci-blue); }
+    .tab.active { color: var(--vci-blue); border-bottom-color: var(--vci-red); }
+
+    .content { padding: 16px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+
+    .box { background: #fff; border-radius: 3px; overflow: hidden; border: 1px solid #e4e4e4; border-top: 3px solid var(--vci-red); }
+    .box-header { padding: 10px 14px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--vci-blue); background: #fafafa; border-bottom: 1px solid #eee; }
+
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    
-    /* RED HEADERS: 12PX CONDENSED - No letter squeezing */
-    th { 
-      background: var(--vci-red); 
-      color: #fff !important; 
-      padding: 8px 1px; 
-      text-align: center; 
-      font-size: 12px; 
-      font-family: 'Open Sans Condensed', sans-serif !important; 
-      text-transform: uppercase; 
-      border: none; 
-      letter-spacing: 0.5px; /* Added spacing to stop letters from "bleeding" */
-    }
-    
-    /* COLUMN WIDTHS: Locked to ensure zero squishing at 900px */
-    .col-stage { width: 34%; text-align: left !important; padding-left: 12px !important; }
-    .col-data { width: 22%; }
+    thead tr { background: var(--vci-red); }
+    th { color: #fff; padding: 7px 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+    th:first-child { text-align: left; padding-left: 14px; }
+    td { padding: 7px 8px; border-bottom: 1px solid #f0f0f0; font-size: 11.5px; text-align: center; color: #444; }
+    td:first-child { text-align: left; padding-left: 14px; font-weight: 700; color: var(--vci-blue); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fdf5f7; }
 
-    /* DATA ROWS: white-space: nowrap + strict font-size */
-    td { padding: 8px 1px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1; white-space: nowrap; }
-    td:first-child { 
-      text-align: left; 
-      padding-left: 12px; 
-      font-weight: 700; 
-      color: var(--vci-blue); 
-      white-space: normal; 
-      line-height: 1.1;
-      font-size: 11px;
-    }
+    .col-stage { width: 35%; }
+    .col-val { width: 21.66%; }
+    .col-val-wide { width: 65%; }
 
-    .del-table .col-time { width: 66%; }
-
-    @media (max-width: 850px) { .snapshot-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-<div class="header-area">
+
+<div class="header">
   <h2>Daily Turn Times</h2>
   <div class="tabs" id="tabBar"></div>
 </div>
-<div class="content-area"><div id="mainDisplay"></div></div>
+<div class="content">
+  <div class="grid" id="mainDisplay"></div>
+</div>
+
 <script>
   const DATA_URL = 'https://raw.githubusercontent.com/timartins5/VCI-portal-data/main/data/turn-times.json';
-  var currentTab = 'Overview';
-  var masterData = null;
+  let currentTab = 'Overview';
+  let masterData = null;
 
   async function fetchData() {
     try {
-      const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
+      const response = await fetch(DATA_URL + '?t=' + Date.now());
       masterData = await response.json();
       render();
-    } catch (e) { document.getElementById('mainDisplay').innerText = 'Syncing...'; }
+    } catch (e) {
+      document.getElementById('mainDisplay').innerHTML = '<p style="color:#888;padding:20px">Syncing data…</p>';
+    }
   }
 
   function render() {
-    let tabList = ['Overview'];
-    let gridGroups = {};
-    masterData.values.forEach((r, idx) => {
-      if (idx === 0) return;
-      let cat = r[0] || "";
+    const tabList = ['Overview'];
+    const groups = {};
+
+    masterData.values.forEach((r, i) => {
+      if (i === 0) return;
+      const cat = (r[0] || '').trim();
       if (!cat || cat.includes('Col A')) return;
-      if (tabList.indexOf(cat) === -1) tabList.push(cat);
+      if (!tabList.includes(cat)) tabList.push(cat);
       if (currentTab === 'Overview' || cat === currentTab) {
-        if (!gridGroups[cat]) gridGroups[cat] = [];
-        gridGroups[cat].push(r);
+        if (!groups[cat]) groups[cat] = [];
+        groups[cat].push(r);
       }
     });
 
-    let tBar = document.getElementById('tabBar'); tBar.innerHTML = '';
+    const bar = document.getElementById('tabBar');
+    bar.innerHTML = '';
     tabList.forEach(t => {
-      let b = document.createElement('button');
-      b.className = 'tab-btn' + (t === currentTab ? ' active' : '');
-      b.innerText = t;
-      b.onclick = function() { currentTab = t; render(); };
-      tBar.appendChild(b);
+      const b = document.createElement('button');
+      b.className = 'tab' + (t === currentTab ? ' active' : '');
+      b.textContent = t;
+      b.onclick = () => { currentTab = t; render(); };
+      bar.appendChild(b);
     });
 
-    let display = document.getElementById('mainDisplay');
+    const display = document.getElementById('mainDisplay');
     display.innerHTML = '';
-    let gridContainer = document.createElement('div');
-    gridContainer.className = 'snapshot-grid';
-    Object.keys(gridGroups).forEach(key => { gridContainer.appendChild(buildBox(key, gridGroups[key])); });
-    display.appendChild(gridContainer);
+    Object.keys(groups).forEach(k => display.appendChild(buildBox(k, groups[k])));
   }
 
   function buildBox(title, rows) {
-    let box = document.createElement('div');
-    box.className = 'category-box';
-    let h = `<div class="category-header">${title}</div>`;
-    
-    if (title.toLowerCase().includes('delegated') && !title.toLowerCase().includes('non')) {
-      h += `<table class="del-table"><thead><tr><th class="col-stage">Stage</th><th class="col-time">Turn Time</th></tr></thead><tbody>`;
-      rows.forEach(r => { h += `<tr><td class="col-stage">${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`; });
-    } else {
-      h += `<table><thead><tr><th class="col-stage">Stage</th><th class="col-data">Purchase</th><th class="col-data">Refi</th><th class="col-data">Streamline</th></tr></thead><tbody>`;
+    const box = document.createElement('div');
+    box.className = 'box';
+    const isDel = title.toLowerCase().includes('delegated') && !title.toLowerCase().includes('non');
+
+    let html = `<div class="box-header">${title}</div><table>`;
+
+    if (isDel) {
+      html += `<thead><tr>
+        <th class="col-stage">Stage</th>
+        <th class="col-val-wide">Turn Time</th>
+      </tr></thead><tbody>`;
       rows.forEach(r => {
-        h += `<tr><td class="col-stage">${r[1]}</td><td class="col-data">${(r[2]||'').replace('|',' ')}</td><td class="col-data">${(r[3]||'').replace('|',' ')}</td><td class="col-data">${(r[4]||'').replace('|',' ')}</td></tr>`;
+        html += `<tr>
+          <td>${r[1] || ''}</td>
+          <td style="text-align:center">${(r[2] || '').replace('|', ' ')}</td>
+        </tr>`;
+      });
+    } else {
+      html += `<thead><tr>
+        <th class="col-stage">Stage</th>
+        <th class="col-val">Purchase</th>
+        <th class="col-val">Refi</th>
+        <th class="col-val">Streamline</th>
+      </tr></thead><tbody>`;
+      rows.forEach(r => {
+        html += `<tr>
+          <td>${r[1] || ''}</td>
+          <td>${(r[2] || '').replace('|', ' ')}</td>
+          <td>${(r[3] || '').replace('|', ' ')}</td>
+          <td>${(r[4] || '').replace('|', ' ')}</td>
+        </tr>`;
       });
     }
-    box.innerHTML = h + '</tbody></table>';
+
+    box.innerHTML = html + '</tbody></table>';
     return box;
   }
+
   fetchData();
 </script>
+
 </body>
 </html>
