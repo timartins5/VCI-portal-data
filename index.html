@@ -2,40 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Open+Sans+Condensed:wght@700&display=swap" rel="stylesheet">
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     * { font-family: 'Open Sans', sans-serif !important; box-sizing: border-box; }
     
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
-    .header-area { background: #fff; padding: 10px 15px; border-bottom: 1px solid #ddd; }
+    .header-area { background: #fff; padding: 8px 15px; border-bottom: 1px solid #ddd; }
     h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 20px; }
-    .uw-disclaimer { font-size: 10px; color: #666; font-style: italic; display: block; margin-top: 2px; }
+    .uw-disclaimer { font-size: 9px; color: #666; font-style: italic; display: block; margin-top: 2px; }
     
-    .tabs { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
-    .tab-btn { padding: 4px 8px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 9px; }
+    .tabs { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+    .tab-btn { padding: 4px 6px; cursor: pointer; background: #eee; border: none; font-weight: 700; text-transform: uppercase; font-size: 8.5px; letter-spacing: -0.2px; }
     .tab-btn.active { background: var(--vci-blue); color: #fff; }
     
     .content-area { padding: 10px; }
-    .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
+    .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
     
-    .category-box { background: #fff; border-top: 3px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow: hidden; }
-    .category-header { padding: 8px 10px; font-weight: 700; text-transform: uppercase; font-size: 12px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
+    .category-box { background: #fff; border-top: 3px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .category-header { padding: 6px 10px; font-weight: 700; text-transform: uppercase; font-size: 11px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
-    /* TABLE HEADERS - Ultra Tight for 800px */
-    th { background: var(--vci-red); color: #fff; padding: 6px 2px; text-align: center; font-size: 8.5px; text-transform: uppercase; letter-spacing: -0.2px; }
-    th:first-child { text-align: left; padding-left: 8px; width: 38%; } /* Give Stage more room */
+    /* THE FIX: Give Stage 42% and the numbers only 19% each */
+    th { background: var(--vci-red); color: #fff; padding: 5px 1px; text-align: center; font-size: 8px; text-transform: uppercase; letter-spacing: -0.4px; }
+    th:first-child { text-align: left; padding-left: 6px; width: 42%; font-size: 9px; } 
     
-    /* DATA CELLS */
-    td { padding: 6px 2px; border-bottom: 1px solid #eee; font-size: 10px; text-align: center; line-height: 1.2; word-wrap: break-word; }
-    td:first-child { text-align: left; padding-left: 8px; font-weight: 700; color: var(--vci-blue); }
+    /* DATA CELLS - Ultra slim padding */
+    td { padding: 5px 1px; border-bottom: 1px solid #eee; font-size: 9.5px; text-align: center; line-height: 1; white-space: nowrap; }
+    td:first-child { text-align: left; padding-left: 6px; font-weight: 700; color: var(--vci-blue); white-space: normal; line-height: 1.1; }
 
-    /* For the Delegated 2-column special view */
-    .delegated-table th:last-child, .delegated-table td:last-child { width: 62%; }
+    /* Delegated View with 2 columns */
+    .delegated-table th:last-child, .delegated-table td:last-child { width: 58%; }
 
-    @media (max-width: 750px) { .snapshot-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 780px) { .snapshot-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -45,7 +45,7 @@
   <div class="tabs" id="tabBar"></div>
 </div>
 <div class="content-area">
-    <div id="mainDisplay">Syncing Data...</div>
+    <div id="mainDisplay"></div>
 </div>
 <script>
   const DATA_URL = 'https://raw.githubusercontent.com/timartins5/VCI-portal-data/main/data/turn-times.json';
