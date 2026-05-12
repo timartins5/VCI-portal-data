@@ -6,7 +6,7 @@
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     
-    /* GLOBAL TEXT SHARPENING */
+    /* ANTI-BLUR ENGINE: Forces the browser to render text with high precision */
     * { 
       font-family: 'Open Sans', sans-serif !important; 
       box-sizing: border-box; 
@@ -25,18 +25,18 @@
     
     .content-area { padding: 15px; }
     
-    /* THE GRID: 2-columns for 900px width */
+    /* GRID SETTING: 2nd-column view optimized for 900px wide */
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     
-    .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; }
+    .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
     
     /* SECTION HEADER: FIXED 14PX */
     .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 14px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     
-    /* THE LOCK: table-layout: fixed stops horizontal "dancing" */
+    /* THE LOCK: table-layout: fixed prevents columns from shifting */
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
-    /* RED HEADERS: 12PX CONDENSED - This prevents the blur/overlap */
+    /* RED HEADERS: 12PX CONDENSED - This provides the extra runway to stop blurring */
     th { 
       background: var(--vci-red); 
       color: #ffffff !important; 
@@ -47,12 +47,12 @@
       text-transform: uppercase; 
       border: none; 
       font-weight: 700;
-      letter-spacing: 0.5px; /* Adds air between letters to stop blurring */
+      letter-spacing: 0.5px; /* Adds air between letters to prevent overlap */
     }
     
-    /* COLUMN PIXEL LOCKING: Frozen at 82px to prevent squishing */
+    /* COLUMN WIDTH LOCKING: Data columns frozen at 85px so they NEVER squish */
     .col-stage { width: auto; text-align: left !important; padding-left: 12px !important; }
-    .col-data { width: 82px; } 
+    .col-data { width: 85px; } 
 
     td { padding: 8px 1px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; color: #333; }
     td:first-child { 
@@ -64,7 +64,7 @@
       white-space: normal;
     }
 
-    /* Handling for 2-column special boxes */
+    /* Handling for 2-column special boxes (Delegated/Audit) */
     .del-table .col-time { width: 65%; }
 
     @media (max-width: 880px) { .snapshot-grid { grid-template-columns: 1fr; } }
