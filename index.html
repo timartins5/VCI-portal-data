@@ -6,20 +6,21 @@
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     
+    /* HARDENED RENDERING ENGINE */
     * { 
       font-family: 'Open Sans', sans-serif !important; 
       box-sizing: border-box; 
       -webkit-font-smoothing: antialiased; 
       -moz-osx-font-smoothing: grayscale;
       text-rendering: geometricPrecision;
-      transform: translateZ(0);
+      transform: translateZ(0); /* Hardware Acceleration */
     }
     
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
     .header-area { background: #fff; padding: 12px 20px; border-bottom: 1px solid #ddd; }
     h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 22px; }
     
-    /* TABS: 12px/600 weight for crystal clarity */
+    /* TABS: 12px/600 weight for sharpness */
     .tabs { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
     .tab-btn { 
       padding: 6px 12px; 
@@ -37,7 +38,7 @@
     
     .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
     
-    /* SECTION HEADER: FIXED TO 15PX - Stops the "top cut off" issue */
+    /* SECTION HEADER: FIXED TO 15PX per your discovery - Stops the top-cut issue */
     .category-header { 
       padding: 10px 15px; 
       font-weight: 700; 
@@ -50,12 +51,13 @@
     
     table { width: 100%; border-collapse: collapse; table-layout: fixed; border-spacing: 0; }
     
+    /* COLUMN HEADERS: FIXED TO 13PX per your latest request */
     th { 
       background: var(--vci-red); 
       color: #ffffff !important; 
       padding: 8px 0; 
       text-align: center; 
-      font-size: 12px; 
+      font-size: 13px; 
       font-family: 'Open Sans Condensed', sans-serif !important; 
       text-transform: uppercase; 
       border: none; 
@@ -63,10 +65,11 @@
       letter-spacing: 0.5px;
     }
     
+    /* DATA COLUMNS LOCKED TO EVEN NUMBERS */
     .col-stage { width: auto; text-align: left !important; padding-left: 12px !important; }
     .col-data { width: 90px; } 
 
-    /* TD CONTENT: 12px/600 weight for sharpness */
+    /* TD CONTENT: 12px/600 weight for crisp lettering */
     td { 
       padding: 8px 1px; 
       border-bottom: 1px solid #eee; 
@@ -146,6 +149,7 @@
     let h = `<div class="category-header">${title}</div>`;
     
     let lowTitle = title.toLowerCase();
+    // Audit & Delegated: 2 columns | All others (inc Non-Del): 4 columns
     if ((lowTitle.includes('delegated') && !lowTitle.includes('non')) || lowTitle.includes('audit')) {
       h += `<table class="del-table"><thead><tr><th class="col-stage">Stage</th><th class="col-time">Turn Time</th></tr></thead><tbody>`;
       rows.forEach(r => { 
