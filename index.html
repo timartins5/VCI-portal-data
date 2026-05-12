@@ -6,7 +6,6 @@
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     
-    /* ANTI-BLUR ENGINE: Forces the browser to render text with high precision */
     * { 
       font-family: 'Open Sans', sans-serif !important; 
       box-sizing: border-box; 
@@ -24,19 +23,13 @@
     .tab-btn.active { background: var(--vci-blue); color: #fff; }
     
     .content-area { padding: 15px; }
-    
-    /* GRID SETTING: 2nd-column view optimized for 900px wide */
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     
     .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
-    
-    /* SECTION HEADER: FIXED 14PX */
     .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 14px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     
-    /* THE LOCK: table-layout: fixed prevents columns from shifting */
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
-    /* RED HEADERS: 12PX CONDENSED - This provides the extra runway to stop blurring */
     th { 
       background: var(--vci-red); 
       color: #ffffff !important; 
@@ -47,10 +40,9 @@
       text-transform: uppercase; 
       border: none; 
       font-weight: 700;
-      letter-spacing: 0.5px; /* Adds air between letters to prevent overlap */
+      letter-spacing: 0.5px;
     }
     
-    /* COLUMN WIDTH LOCKING: Data columns frozen at 85px so they NEVER squish */
     .col-stage { width: auto; text-align: left !important; padding-left: 12px !important; }
     .col-data { width: 85px; } 
 
@@ -64,7 +56,7 @@
       white-space: normal;
     }
 
-    /* Handling for 2-column special boxes (Delegated/Audit) */
+    /* Handling for 2-column special boxes */
     .del-table .col-time { width: 65%; }
 
     @media (max-width: 880px) { .snapshot-grid { grid-template-columns: 1fr; } }
@@ -86,7 +78,7 @@
       const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
       masterData = await response.json();
       render();
-    } catch (e) { document.getElementById('mainDisplay').innerText = 'Updating...'; }
+    } catch (e) { document.getElementById('mainDisplay').innerText = 'Syncing...'; }
   }
 
   function render() {
@@ -125,8 +117,10 @@
     box.className = 'category-box';
     let h = `<div class="category-header">${title}</div>`;
     
-    // Auto-detect if box should be 2nd-column style (Delegated/Audit)
-    if (title.toLowerCase().includes('delegated') || title.toLowerCase().includes('audit')) {
+    // LOGIC: Only Delegated and Audit get 2 columns. 
+    // Non-Delegated now correctly falls into the 4-column "else" section.
+    let lowTitle = title.toLowerCase();
+    if ((lowTitle.includes('delegated') && !lowTitle.includes('non')) || lowTitle.includes('audit')) {
       h += `<table class="del-table"><thead><tr><th class="col-stage">Stage</th><th class="col-time">Turn Time</th></tr></thead><tbody>`;
       rows.forEach(r => { h += `<tr><td class="col-stage">${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`; });
     } else {
