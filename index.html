@@ -6,14 +6,13 @@
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     
-    /* ANTI-BLUR ENGINE: High-precision rendering */
+    /* ANTI-BLUR ENGINE: Hard-pixel rendering */
     * { 
       font-family: 'Open Sans', sans-serif !important; 
       box-sizing: border-box; 
       -webkit-font-smoothing: antialiased; 
-      -moz-osx-font-smoothing: grayscale;
       text-rendering: geometricPrecision;
-      backface-visibility: hidden; /* Forces GPU rendering to stop vibration */
+      -webkit-transform: translateZ(0); /* Forces GPU high-fidelity text rendering */
     }
     
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
@@ -32,7 +31,7 @@
     
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
-    /* RED HEADERS: Use Condensed font for maximum clarity */
+    /* RED HEADERS: Use Condensed font for crispness at 12px */
     th { 
       background: var(--vci-red); 
       color: #ffffff !important; 
@@ -46,7 +45,7 @@
       letter-spacing: 0.5px;
     }
     
-    /* PIXEL LOCKING: Frozen at 88px so columns CANNOT vibrate or squish */
+    /* PIXEL LOCKING: We hard-code 88px so the browser can't "guess" the width */
     .col-stage { width: auto; text-align: left !important; padding-left: 12px !important; }
     .col-data { width: 88px; } 
 
@@ -56,7 +55,6 @@
       padding-left: 12px; 
       font-weight: 700; 
       color: var(--vci-blue); 
-      word-wrap: break-word; 
       white-space: normal;
     }
 
@@ -121,7 +119,7 @@
     let h = `<div class="category-header">${title}</div>`;
     
     let lowTitle = title.toLowerCase();
-    // Only Delegated and Audit get 2 columns. Non-Del restored to 4 columns.
+    // Delegated & Audit remain 2-column. ALL others (Wholesale, Mini, Non-Del) are 4-column.
     if ((lowTitle.includes('delegated') && !lowTitle.includes('non')) || lowTitle.includes('audit')) {
       h += `<table class="del-table"><thead><tr><th class="col-stage">Stage</th><th class="col-time">Turn Time</th></tr></thead><tbody>`;
       rows.forEach(r => { h += `<tr><td class="col-stage">${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`; });
