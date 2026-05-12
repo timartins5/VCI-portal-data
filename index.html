@@ -2,16 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Open+Sans+Condensed:wght@700&display=swap" rel="stylesheet">
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     
-    /* THE CRYSTAL CLEAR FIX: Disables browser-side font warping */
+    /* ANTI-BLUR FIX: High precision font rendering */
     * { 
       font-family: 'Open Sans', sans-serif !important; 
       box-sizing: border-box; 
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       text-rendering: geometricPrecision;
     }
     
@@ -25,33 +24,31 @@
     
     .content-area { padding: 15px; }
     
-    /* THE GRID: 2-columns for 900px width */
+    /* GRID SETTING: 2 columns for 900px, stacks at 800px if needed */
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     
     .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; }
-    
-    /* SECTION HEADER: FIXED 14PX */
     .category-header { padding: 10px 15px; font-weight: 700; text-transform: uppercase; font-size: 14px; color: var(--vci-blue); border-bottom: 1px solid #eee; }
     
-    /* THE LOCK: table-layout: fixed stops horizontal dancing */
+    /* THE LOCK: table-layout: fixed stops the table from growing too wide */
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
-    /* RED HEADERS: 12PX - High Contrast Fix */
+    /* RED HEADERS: 12PX CONDENSED - Extra space for clear lettering */
     th { 
       background: var(--vci-red); 
-      color: #ffffff !important; 
+      color: #fff !important; 
       padding: 8px 1px; 
       text-align: center; 
       font-size: 12px; 
+      font-family: 'Open Sans Condensed', sans-serif !important; 
       text-transform: uppercase; 
-      border: none; 
-      font-weight: 700;
+      border: none;
       letter-spacing: 0.3px;
     }
     
-    /* COLUMN PIXEL LOCKING: Numbers stay 85px wide to prevent "fucked up" squishing */
+    /* PIXEL LOCKING: Frozen at 82px to prevent squishing */
     .col-stage { width: auto; text-align: left !important; padding-left: 12px !important; }
-    .col-data { width: 85px; } 
+    .col-data { width: 82px; } 
 
     td { padding: 8px 1px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; color: #333; }
     td:first-child { 
@@ -59,14 +56,13 @@
       padding-left: 12px; 
       font-weight: 700; 
       color: var(--vci-blue); 
-      word-wrap: break-word; 
       white-space: normal;
+      word-wrap: break-word;
     }
 
-    /* Logic for 2-column boxes (Delegated/Audit) */
-    .del-table .col-time { width: 65%; }
+    /* Logic for 2-column special boxes */
+    .del-table .col-time { width: 60%; }
 
-    /* Breakpoint: Switch to single column if window is under 880px */
     @media (max-width: 880px) { .snapshot-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -125,7 +121,7 @@
     box.className = 'category-box';
     let h = `<div class="category-header">${title}</div>`;
     
-    // Auto-detect if box should be 2-column or 4-column
+    // Auto-detect if box should be 2nd-column style (Delegated/Audit)
     if (title.toLowerCase().includes('delegated') || title.toLowerCase().includes('audit')) {
       h += `<table class="del-table"><thead><tr><th class="col-stage">Stage</th><th class="col-time">Turn Time</th></tr></thead><tbody>`;
       rows.forEach(r => { h += `<tr><td class="col-stage">${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`; });
