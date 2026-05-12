@@ -6,12 +6,14 @@
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     
+    /* ANTI-BLUR ENGINE: High-precision rendering */
     * { 
       font-family: 'Open Sans', sans-serif !important; 
       box-sizing: border-box; 
       -webkit-font-smoothing: antialiased; 
       -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
+      text-rendering: geometricPrecision;
+      backface-visibility: hidden; /* Forces GPU rendering to stop vibration */
     }
     
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
@@ -30,6 +32,7 @@
     
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     
+    /* RED HEADERS: Use Condensed font for maximum clarity */
     th { 
       background: var(--vci-red); 
       color: #ffffff !important; 
@@ -43,8 +46,9 @@
       letter-spacing: 0.5px;
     }
     
+    /* PIXEL LOCKING: Frozen at 88px so columns CANNOT vibrate or squish */
     .col-stage { width: auto; text-align: left !important; padding-left: 12px !important; }
-    .col-data { width: 85px; } 
+    .col-data { width: 88px; } 
 
     td { padding: 8px 1px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center; line-height: 1.2; color: #333; }
     td:first-child { 
@@ -56,7 +60,6 @@
       white-space: normal;
     }
 
-    /* Handling for 2-column special boxes */
     .del-table .col-time { width: 65%; }
 
     @media (max-width: 880px) { .snapshot-grid { grid-template-columns: 1fr; } }
@@ -117,9 +120,8 @@
     box.className = 'category-box';
     let h = `<div class="category-header">${title}</div>`;
     
-    // LOGIC: Only Delegated and Audit get 2 columns. 
-    // Non-Delegated now correctly falls into the 4-column "else" section.
     let lowTitle = title.toLowerCase();
+    // Only Delegated and Audit get 2 columns. Non-Del restored to 4 columns.
     if ((lowTitle.includes('delegated') && !lowTitle.includes('non')) || lowTitle.includes('audit')) {
       h += `<table class="del-table"><thead><tr><th class="col-stage">Stage</th><th class="col-time">Turn Time</th></tr></thead><tbody>`;
       rows.forEach(r => { h += `<tr><td class="col-stage">${r[1]}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`; });
