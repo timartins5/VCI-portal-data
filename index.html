@@ -6,21 +6,19 @@
   <style>
     :root { --vci-red: #AD2542; --vci-blue: #1B324A; --vci-gray: #F5F5F5; }
     
-    /* HARDENED RENDERING ENGINE */
     * { 
       font-family: 'Open Sans', sans-serif !important; 
       box-sizing: border-box; 
       -webkit-font-smoothing: antialiased; 
       -moz-osx-font-smoothing: grayscale;
       text-rendering: geometricPrecision;
-      transform: translateZ(0); /* Hardware Acceleration */
+      transform: translateZ(0);
     }
     
     body { margin: 0; padding: 0; background-color: var(--vci-gray); color: #333; overflow-x: hidden; }
     .header-area { background: #fff; padding: 12px 20px; border-bottom: 1px solid #ddd; }
     h2 { color: var(--vci-blue); font-weight: 700; text-transform: uppercase; margin: 0; font-size: 22px; }
     
-    /* TABS: 12px/600 weight for sharpness */
     .tabs { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
     .tab-btn { 
       padding: 6px 12px; 
@@ -37,8 +35,6 @@
     .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
     
     .category-box { background: #fff; border-top: 4px solid var(--vci-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
-    
-    /* SECTION HEADER: FIXED TO 15PX per your discovery - Stops the top-cut issue */
     .category-header { 
       padding: 10px 15px; 
       font-weight: 700; 
@@ -51,7 +47,6 @@
     
     table { width: 100%; border-collapse: collapse; table-layout: fixed; border-spacing: 0; }
     
-    /* COLUMN HEADERS: FIXED TO 13PX per your latest request */
     th { 
       background: var(--vci-red); 
       color: #ffffff !important; 
@@ -65,11 +60,9 @@
       letter-spacing: 0.5px;
     }
     
-    /* DATA COLUMNS LOCKED TO EVEN NUMBERS */
     .col-stage { width: auto; text-align: left !important; padding-left: 12px !important; }
     .col-data { width: 90px; } 
 
-    /* TD CONTENT: 12px/600 weight for crisp lettering */
     td { 
       padding: 8px 1px; 
       border-bottom: 1px solid #eee; 
@@ -98,7 +91,7 @@
   <h2>Daily Turn Times</h2>
   <div class="tabs" id="tabBar"></div>
 </div>
-<div class="content-area"><div id="mainDisplay">Loading latest data...</div></div>
+<div class="content-area"><div id="mainDisplay">Loading Data...</div></div>
 <script>
   const DATA_URL = 'https://raw.githubusercontent.com/timartins5/VCI-portal-data/main/data/turn-times.json';
   var currentTab = 'Overview';
@@ -109,7 +102,23 @@
       const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
       masterData = await response.json();
       render();
-    } catch (e) { document.getElementById('mainDisplay').innerText = 'Syncing...'; }
+    } catch (e) { document.getElementById('mainDisplay').innerText = 'Updating...'; }
+  }
+
+  // THE GRAMMAR ENGINE: Matches the logic in your Web App
+  function formatLabel(valStr) {
+    if (!valStr) return "0 Days";
+    var p = valStr.split('|');
+    var num = parseInt(p[0]);
+    var unit = p[1];
+    if (isNaN(num)) return valStr.replace('|', ' '); // Fallback for old data
+    
+    // Always plural if 0, more than 1, or less than -1
+    if (num === 0 || num > 1 || num < -1) {
+      return num + " " + (unit.endsWith('s') ? unit : unit + "s");
+    }
+    // Singular if exactly 1
+    return num + " " + (unit.endsWith('s') ? unit.slice(0, -1) : unit);
   }
 
   function render() {
@@ -149,12 +158,11 @@
     let h = `<div class="category-header">${title}</div>`;
     
     let lowTitle = title.toLowerCase();
-    // Audit & Delegated: 2 columns | All others (inc Non-Del): 4 columns
     if ((lowTitle.includes('delegated') && !lowTitle.includes('non')) || lowTitle.includes('audit')) {
       h += `<table class="del-table"><thead><tr><th class="col-stage">Stage</th><th class="col-time">Turn Time</th></tr></thead><tbody>`;
       rows.forEach(r => { 
         let stageName = r[1] === "Underwriting" ? "Initial Underwriting" : r[1];
-        h += `<tr><td class="col-stage">${stageName}</td><td>${(r[2]||'').replace('|',' ')}</td></tr>`; 
+        h += `<tr><td class="col-stage">${stageName}</td><td>${formatLabel(r[2])}</td></tr>`; 
       });
     } else {
       h += `<table><thead><tr><th class="col-stage">Stage</th><th class="col-data">Purchase</th><th class="col-data">Refi</th><th class="col-data">Streamline</th></tr></thead><tbody>`;
@@ -162,9 +170,9 @@
         let stageName = r[1] === "Underwriting" ? "Initial Underwriting" : r[1];
         h += `<tr>
                 <td class="col-stage">${stageName}</td>
-                <td class="col-data">${(r[2]||'').replace('|',' ')}</td>
-                <td class="col-data">${(r[3]||'').replace('|',' ')}</td>
-                <td class="col-data">${(r[4]||'').replace('|',' ')}</td>
+                <td class="col-data">${formatLabel(r[2])}</td>
+                <td class="col-data">${formatLabel(r[3])}</td>
+                <td class="col-data">${formatLabel(r[4])}</td>
               </tr>`;
       });
     }
