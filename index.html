@@ -166,19 +166,19 @@
         <div id="mainDisplay">Loading Data...</div>
     </div>
     <script>
-        // Fixed URL path to handle cache busting and relative structure cleanly
+        // Fetches your raw json data directly from your repo's data directory
         const DATA_URL = './data/turn-times.json';
         var currentTab = 'Overview';
         var masterData = null;
 
-        async function fetchData() {
+        async function loadData() {
             try {
                 const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
                 masterData = await response.json();
                 render();
             } catch (e) { 
-                console.error(e);
-                document.getElementById('mainDisplay').innerText = 'Error loading dashboard data.'; 
+                console.error("Failed to load data:", e);
+                document.getElementById('mainDisplay').innerText = 'Error loading turn times data file.'; 
             }
         }
 
@@ -252,7 +252,9 @@
             box.innerHTML = h + '</tbody></table>';
             return box;
         }
-        fetchData();
+        
+        // Fire data fetch immediately on layout load
+        loadData();
     </script>
 </body>
 
