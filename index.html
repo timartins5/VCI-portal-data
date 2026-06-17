@@ -3,9 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Open+Sans+Condensed:wght@700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Open+Sans+Condensed:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --vci-red: #AD2542;
@@ -106,7 +104,7 @@
         }
 
         th {
-            background: var(--vci-blue); /* Aligned with Admin dashboard and corporate brand */
+            background: var(--vci-blue);
             color: #ffffff !important;
             padding: 8px 0;
             text-align: center;
@@ -168,7 +166,8 @@
         <div id="mainDisplay">Loading Data...</div>
     </div>
     <script>
-        const DATA_URL = 'https://raw.githubusercontent.com/timartins5/VCI-portal-data/main/data/turn-times.json';
+        // Fixed URL path to handle cache busting and relative structure cleanly
+        const DATA_URL = './data/turn-times.json';
         var currentTab = 'Overview';
         var masterData = null;
 
@@ -177,22 +176,25 @@
                 const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
                 masterData = await response.json();
                 render();
-            } catch (e) { document.getElementById('mainDisplay').innerText = 'Updating...'; }
+            } catch (e) { 
+                console.error(e);
+                document.getElementById('mainDisplay').innerText = 'Error loading dashboard data.'; 
+            }
         }
 
-        // THE HARDENED GRAMMAR ENGINE: Matches the display logic in the Web App safely
         function formatLabel(valStr) {
             if (!valStr || valStr === "0") return "---";
             var p = valStr.split('|');
             var num = parseInt(p[0]);
             var unit = p[1] || 'Day';
-            if (isNaN(num)) return valStr.replace('|', ' '); // Fallback for old data or labels
+            if (isNaN(num)) return valStr.replace('|', ' ');
 
             var cleanUnit = unit.endsWith('s') ? unit.slice(0, -1) : unit;
             return num + " " + (num === 1 ? cleanUnit : cleanUnit + "s");
         }
 
         function render() {
+            if (!masterData || !masterData.values) return;
             let tabList = ['Overview'];
             let gridGroups = {};
             masterData.values.forEach((r, idx) => {
