@@ -117,48 +117,50 @@
         th {
             background: var(--vci-blue);
             color: #ffffff !important;
-            padding: 4px 2px; /* Tightened from 8px */
+            padding: 6px 1px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             font-family: 'Open Sans Condensed', sans-serif !important;
             text-transform: uppercase;
             border: none;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
         }
 
+        /* Adjust column proportions: give more width to Stage Name, shrink data columns slightly */
         .col-stage {
-            width: 38%;
+            width: 44% !important; /* Increased from ~38% so Initial Underwriting & Disclosures fit */
             text-align: left !important;
-            padding-left: 12px !important;
+            padding-left: 8px !important;
         }
 
         .col-data {
-            width: 20%;
+            width: 18.6% !important; /* Adjusted so Purchase, Refi, Streamline share remaining space evenly */
         }
 
         td {
-            padding: 8px 4px;
+            padding: 4px 2px;
             border-bottom: 1px solid #eee;
-            font-size: 12px;
-            text-align: center;
-            line-height: 1.2;
-            color: #333;
-            font-weight: 600;
-        }
-
-        td {
-            padding: 4px 4px; /* Tightened from 8px */
-            border-bottom: 1px solid #eee;
-            font-size: 11.5px;
+            font-size: 11px;
             text-align: center;
             line-height: 1.15;
             color: #333;
             font-weight: 600;
+            white-space: nowrap; /* Prevents "24 Hours" from wrapping onto two lines */
+        }
+
+        td:first-child {
+            text-align: left;
+            padding-left: 8px;
+            font-weight: 700;
+            color: var(--vci-blue);
+            white-space: normal; /* Allows long stage names like Initial Closing Disclosure to wrap cleanly if needed */
+            word-wrap: break-word;
         }
 
         .del-table .col-time {
-            width: 62%;
+            width: 56% !important;
         }
 
         /* Mobile Breakpoint Optimization */
