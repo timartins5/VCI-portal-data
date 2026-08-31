@@ -198,7 +198,7 @@
 
         async function loadData() {
             try {
-                const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
+                const response = await fetch(DATA_URL + '?t=' + new Date().getTime(), { cache: 'no-store' });
                 masterData = await response.json();
                 render();
             } catch (e) { 
