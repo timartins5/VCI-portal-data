@@ -3,9 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Open+Sans+Condensed:wght@700&display=swap"
-        rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Open+Sans+Condensed:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --vci-red: #AD2542;
@@ -28,6 +27,7 @@
             background-color: var(--vci-gray);
             color: #333;
             overflow-x: hidden;
+            width: 100%;
         }
 
         .header-area {
@@ -71,13 +71,22 @@
 
         .content-area {
             padding: 15px;
+            width: 100%;
+            /* Centers the entire dashboard on ultra-wide screens */
+            display: flex;
+            justify-content: center;
         }
 
+        /* RESPONSIVE & CONTROLLED GRID CONFIGURATION */
         .snapshot-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            /* Changed from auto-fit to auto-fill so cards don't balloon in size */
+            grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
             gap: 20px;
             align-items: start;
+            width: 100%;
+            /* Caps the total width so it matches the compact iframe aspect ratio */
+            max-width: 1100px; 
         }
 
         .category-box {
@@ -89,10 +98,10 @@
         }
 
         .category-header {
-            padding: 10px 15px;
+            padding: 6px 12px; /* Reduced vertical padding */
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 15px;
+            font-size: 14px;
             color: var(--vci-blue);
             border-bottom: 1px solid #eee;
             line-height: 1.2;
@@ -106,54 +115,68 @@
         }
 
         th {
-            background: var(--vci-blue); /* Aligned with Admin dashboard and corporate brand */
+            background: var(--vci-blue);
             color: #ffffff !important;
-            padding: 8px 0;
+            padding: 6px 1px;
             text-align: center;
-            font-size: 13px;
+            font-size: 11px;
             font-family: 'Open Sans Condensed', sans-serif !important;
             text-transform: uppercase;
             border: none;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
         }
 
+        /* Adjust column proportions: give more width to Stage Name, shrink data columns slightly */
         .col-stage {
-            width: auto;
+            width: 44% !important; /* Increased from ~38% so Initial Underwriting & Disclosures fit */
             text-align: left !important;
-            padding-left: 12px !important;
+            padding-left: 8px !important;
         }
 
         .col-data {
-            width: 90px;
+            width: 18.6% !important; /* Adjusted so Purchase, Refi, Streamline share remaining space evenly */
         }
 
         td {
-            padding: 8px 1px;
+            padding: 4px 2px;
             border-bottom: 1px solid #eee;
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
-            line-height: 1.2;
+            line-height: 1.15;
             color: #333;
             font-weight: 600;
+            white-space: nowrap; /* Prevents "24 Hours" from wrapping onto two lines */
         }
 
         td:first-child {
             text-align: left;
-            padding-left: 12px;
+            padding-left: 8px;
             font-weight: 700;
             color: var(--vci-blue);
+            white-space: normal; /* Allows long stage names like Initial Closing Disclosure to wrap cleanly if needed */
             word-wrap: break-word;
-            white-space: normal;
         }
 
         .del-table .col-time {
-            width: 65%;
+            width: 56% !important;
         }
 
-        @media (max-width: 880px) {
+        /* Mobile Breakpoint Optimization */
+        @media (max-width: 480px) {
             .snapshot-grid {
                 grid-template-columns: 1fr;
+            }
+            .col-stage {
+                width: 45%;
+            }
+            th {
+                font-size: 11px;
+            }
+            td {
+                font-size: 11px;
+                padding: 8px 2px;
             }
         }
     </style>
@@ -168,31 +191,35 @@
         <div id="mainDisplay">Loading Data...</div>
     </div>
     <script>
+        // Fetches your raw json data directly from your repo's data directory
         const DATA_URL = 'https://raw.githubusercontent.com/timartins5/VCI-portal-data/main/data/turn-times.json';
         var currentTab = 'Overview';
         var masterData = null;
 
-        async function fetchData() {
+        async function loadData() {
             try {
-                const response = await fetch(DATA_URL + '?t=' + new Date().getTime(), { cache: 'no-store' });
+                const response = await fetch(DATA_URL + '?t=' + new Date().getTime());
                 masterData = await response.json();
                 render();
-            } catch (e) { document.getElementById('mainDisplay').innerText = 'Updating...'; }
+            } catch (e) { 
+                console.error("Failed to load data:", e);
+                document.getElementById('mainDisplay').innerText = 'Error loading turn times data file.'; 
+            }
         }
 
-        // THE HARDENED GRAMMAR ENGINE: Matches the display logic in the Web App safely
         function formatLabel(valStr) {
             if (!valStr || valStr === "0") return "---";
             var p = valStr.split('|');
             var num = parseInt(p[0]);
             var unit = p[1] || 'Day';
-            if (isNaN(num)) return valStr.replace('|', ' '); // Fallback for old data or labels
+            if (isNaN(num)) return valStr.replace('|', ' ');
 
             var cleanUnit = unit.endsWith('s') ? unit.slice(0, -1) : unit;
             return num + " " + (num === 1 ? cleanUnit : cleanUnit + "s");
         }
 
         function render() {
+            if (!masterData || !masterData.values) return;
             let tabList = ['Overview'];
             let gridGroups = {};
             masterData.values.forEach((r, idx) => {
@@ -250,7 +277,9 @@
             box.innerHTML = h + '</tbody></table>';
             return box;
         }
-        fetchData();
+        
+        // Fire data fetch immediately on layout load
+        loadData();
     </script>
 </body>
 
